@@ -40,56 +40,77 @@
       color: #00e676;
       font-weight: bold;
     }
-    .no-suggestion {
-      margin-top: 10px;
-      color: #ccc;
+    .details {
       font-size: 14px;
+      margin-top: 8px;
+      line-height: 1.6;
     }
   </style>
 </head>
 <body>
-  <h1>📈 توصيات العملات الذكية (RSI + MACD)</h1>
+  <h1>📈 توصيات العملات الذكية (RSI + MACD + السعر والاهداف)</h1>
   <div class="grid" id="cardsGrid">
     <div>جاري تحميل التوصيات...</div>
   </div>
 
   <script>
     const apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjgxM2Q4NWU4MDZmZjE2NTFlNjM2ZTAxIiwiaWF0IjoxNzQ2MTMxODg4LCJleHAiOjMzMjUwNTk1ODg4fQ.oiEizjwC-mbN2WLAlyo5i2Sjqin9-IOFFUkAKrP7YNM";
-    const symbols = ["BTC", "ETH", "XRP"]; // العملات المدعومة في الخطة المجانية فقط
+    const allSymbols = ["XRP", "LTC", "XMR", "SOL", "DOGE", "ADA", "AVAX", "AR", "RNDR", "TRX", "MATIC"];
+    const excluded = ["BTC", "ETH", "BNB"];
 
     async function fetchRecommendation(symbol) {
       const interval = "1h";
-      const rsiUrl = `https://api.taapi.io/rsi?secret=${apiKey}&exchange=binance&symbol=${symbol}/USD&interval=${interval}`;
-      const macdUrl = `https://api.taapi.io/macd?secret=${apiKey}&exchange=binance&symbol=${symbol}/USD&interval=${interval}`;
+      const rsiUrl = `https://api.taapi.io/rsi?secret=${apiKey}&exchange=binance&symbol=${symbol}/USDT&interval=${interval}`;
+      const macdUrl = `https://api.taapi.io/macd?secret=${apiKey}&exchange=binance&symbol=${symbol}/USDT&interval=${interval}`;
+      const priceUrl = `https://api.binance.com/api/v3/ticker/price?symbol=${symbol}USDT`;
 
       try {
-        const [rsiRes, macdRes] = await Promise.all([fetch(rsiUrl), fetch(macdUrl)]);
+        const [rsiRes, macdRes, priceRes] = await Promise.all([
+          fetch(rsiUrl),
+          fetch(macdUrl),
+          fetch(priceUrl)
+        ]);
+
         const rsiData = await rsiRes.json();
         const macdData = await macdRes.json();
+        const priceData = await priceRes.json();
 
         const rsi = parseFloat(rsiData.value).toFixed(2);
         const macd = parseFloat(macdData.valueMACD).toFixed(3);
         const signal = parseFloat(macdData.valueSignal).toFixed(3);
+        const price = parseFloat(priceData.price).toFixed(4);
 
         const isRSIGood = rsi >= 45 && rsi <= 60;
-        const isMACDPositive = parseFloat(macd) > parseFloat(signal);
+        const isMACDPositive = macd > signal;
 
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <h2>${symbol}/USD</h2>
-          <p>RSI: ${rsi}</p>
-          <p>MACD: ${macd} / Signal: ${signal}</p>
-          ${isRSIGood && isMACDPositive ? '<div class="suggestion">✅ توصية شراء</div>' : '<div class="no-suggestion">❌ لا توجد توصية حالياً</div>'}
-        `;
-        document.getElementById("cardsGrid").appendChild(card);
+        if (isRSIGood && isMACDPositive) {
+          const target1 = (price * 1.05).toFixed(4);
+          const target2 = (price * 1.10).toFixed(4);
+          const resistance = (price * 1.03).toFixed(4);
+
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <h2>${symbol}/USDT</h2>
+            <p>RSI: ${rsi}</p>
+            <p>MACD: ${macd} / Signal: ${signal}</p>
+            <div class="details">
+              <strong>السعر الحالي:</strong> $${price}<br>
+              <strong>مقاومة قريبة:</strong> $${resistance}<br>
+              <strong>الهدف 1:</strong> $${target1}<br>
+              <strong>الهدف 2:</strong> $${target2}
+            </div>
+            <div class="suggestion">✅ توصية شراء</div>
+          `;
+          document.getElementById("cardsGrid").appendChild(card);
+        }
       } catch (error) {
         console.error("❌ خطأ أثناء جلب البيانات:", error);
       }
     }
 
     document.getElementById("cardsGrid").innerHTML = "";
-    symbols.forEach(fetchRecommendation);
+    allSymbols.filter(symbol => !excluded.includes(symbol)).forEach(fetchRecommendation);
   </script>
 </body>
 </html>
