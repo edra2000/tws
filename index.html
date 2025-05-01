@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>📊 توصيات العملات الذكية (تلقائي بالكامل)</title>
+  <meta charset="UTF-8" />
+  <title>📊 توصيات العملات الذكية (موثوقة فقط)</title>
   <script src="https://cdn.jsdelivr.net/npm/technicalindicators@3.1.1/dist/browser.js"></script>
   <style>
     body {
@@ -41,19 +41,26 @@
   </style>
 </head>
 <body>
-  <h1>📈 توصيات العملات الذكية (RSI + MACD + ارتفاع +5%)</h1>
-  <div class="grid" id="cardsGrid">جاري التحميل...</div>
+  <h1>📈 توصيات العملات الذكية (فلترة مدعومة + تحليل محلي)</h1>
+  <div class="grid" id="cardsGrid">جاري التحليل...</div>
 
   <script>
-    async function fetchTopMovers() {
+    async function getSupportedSymbols() {
+      const info = await fetch("https://api.binance.com/api/v3/exchangeInfo").then(res => res.json());
+      return info.symbols
+        .filter(s => s.symbol.endsWith("USDT") && s.status === "TRADING")
+        .map(s => s.symbol);
+    }
+
+    async function fetchTopMovers(supported) {
       const res = await fetch("https://api.binance.com/api/v3/ticker/24hr");
       const data = await res.json();
 
       const filtered = data.filter(c =>
-        c.symbol.endsWith("USDT") &&
-        !["BUSD", "USDC", "TUSD", "USDT", "FDUSD", "DAI"].some(stable => c.symbol.startsWith(stable)) &&
+        supported.includes(c.symbol) &&
         parseFloat(c.priceChangePercent) > 5 &&
-        parseFloat(c.lastPrice) > 0
+        parseFloat(c.lastPrice) > 0 &&
+        !["BUSD", "USDC", "TUSD", "USDT", "FDUSD", "DAI"].some(stable => c.symbol.startsWith(stable))
       );
 
       return filtered
@@ -69,12 +76,8 @@
       return data.map(c => parseFloat(c[4])); // close prices
     }
 
-    
-function analyze(symbol, closes) {
-  if (!closes || closes.length < 50) {
-    console.warn("⚠️ شموع غير كافية:", symbol);
-    return;
-  }
+    function analyze(symbol, closes) {
+      if (!closes || closes.length < 50) return;
 
       const rsi = window.RSI.calculate({ values: closes, period: 14 });
       const macd = window.MACD.calculate({
@@ -108,33 +111,27 @@ function analyze(symbol, closes) {
           </div>
           <div class="suggestion">✅ توصية شراء</div>
         `;
-        document.getElementById("cardsGrid").appendChild(card); shown++;
+        document.getElementById("cardsGrid").appendChild(card);
       }
     }
 
-    async function runAutoAnalysis() {
-      
-document.getElementById("cardsGrid").innerHTML = "جاري التحليل...";
-let analyzed = 0;
-let shown = 0;
-
-      const symbols = await fetchTopMovers();
+    async function runFullAnalysis() {
+      document.getElementById("cardsGrid").innerHTML = "جاري التحليل...";
+      const supported = await getSupportedSymbols();
+      const symbols = await fetchTopMovers(supported);
+      console.log("🧠 العملات المحددة:", symbols);
 
       for (let symbol of symbols) {
         try {
           const closes = await fetchCandles(symbol);
-          
-analyzed++;
-console.log(`🔍 ${symbol}: RSI ${window.RSI.calculate({ values: closes, period: 14 }).slice(-1)[0]?.toFixed(2)}, MACD ${window.MACD.calculate({ values: closes, fastPeriod: 12, slowPeriod: 26, signalPeriod: 9 }).slice(-1)[0]?.MACD?.toFixed(2)}`);
-analyze(symbol, closes);
-
+          analyze(symbol, closes);
         } catch (err) {
-          console.warn("❌ فشل:", symbol, err.message);
+          console.warn("❌", symbol, err.message);
         }
       }
     }
 
-    window.addEventListener('load', runAutoAnalysis);
+    window.addEventListener("load", runFullAnalysis);
   </script>
 </body>
 </html>
