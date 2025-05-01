@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📊 توصيات العملات</title>
+  <title>📊 توصيات العملات (آمنة بدون ضغط)</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -48,18 +48,18 @@
   </style>
 </head>
 <body>
-  <h1>📈 توصيات العملات الذكية (RSI + MACD + السعر والاهداف)</h1>
+  <h1>📈 توصيات العملات الذكية (بدون ضغط API)</h1>
   <div class="grid" id="cardsGrid">
     <div>جاري تحميل التوصيات...</div>
   </div>
 
   <script>
     const apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjgxM2Q4NWU4MDZmZjE2NTFlNjM2ZTAxIiwiaWF0IjoxNzQ2MTMxODg4LCJleHAiOjMzMjUwNTk1ODg4fQ.oiEizjwC-mbN2WLAlyo5i2Sjqin9-IOFFUkAKrP7YNM";
-    const allSymbols = ["XRP", "LTC", "XMR", "SOL", "DOGE", "ADA", "AVAX", "AR", "RNDR", "TRX", "MATIC"];
-    const excluded = ["BTC", "ETH", "BNB"];
+    const symbols = ["XRP", "LTC", "DOGE", "SOL", "TRX"];
+    const interval = "1h";
+    const delayBetweenRequests = 5000; // 5 ثواني
 
     async function fetchRecommendation(symbol) {
-      const interval = "1h";
       const rsiUrl = `https://api.taapi.io/rsi?secret=${apiKey}&exchange=binance&symbol=${symbol}/USDT&interval=${interval}`;
       const macdUrl = `https://api.taapi.io/macd?secret=${apiKey}&exchange=binance&symbol=${symbol}/USDT&interval=${interval}`;
       const priceUrl = `https://api.binance.com/api/v3/ticker/price?symbol=${symbol}USDT`;
@@ -104,13 +104,20 @@
           `;
           document.getElementById("cardsGrid").appendChild(card);
         }
-      } catch (error) {
-        console.error("❌ خطأ أثناء جلب البيانات:", error);
+      } catch (err) {
+        console.warn(`⚠️ فشل تحميل ${symbol}:`, err.message);
       }
     }
 
-    document.getElementById("cardsGrid").innerHTML = "";
-    allSymbols.filter(symbol => !excluded.includes(symbol)).forEach(fetchRecommendation);
+    async function startSequentialAnalysis() {
+      document.getElementById("cardsGrid").innerHTML = "";
+      for (let i = 0; i < symbols.length; i++) {
+        await fetchRecommendation(symbols[i]);
+        await new Promise(resolve => setTimeout(resolve, delayBetweenRequests));
+      }
+    }
+
+    startSequentialAnalysis();
   </script>
 </body>
 </html>
