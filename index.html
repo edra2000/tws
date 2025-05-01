@@ -166,6 +166,37 @@
 
     document.getElementById('filterInput').addEventListener('input', applyFilter);
   fetchRecommendationsFromBinance();
+ // سكربت التوصيات الذكية (RSI + MACD)
+    const apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjgxM2Q4NWU4MDZmZjE2NTFlNjM2ZTAxIiwiaWF0IjoxNzQ2MTMxODg4LCJleHAiOjMzMjUwNTk1ODg4fQ.oiEizjwC-mbN2WLAlyo5i2Sjqin9-IOFFUkAKrP7YNM";
+    const symbols = ["BTC", "ETH", "XRP"];
 
+    async function fetchRecommendation(symbol) {
+      const interval = "1h";
+      const rsiUrl = `https://api.taapi.io/rsi?secret=${apiKey}&exchange=binance&symbol=${symbol}/USD&interval=${interval}`;
+      const macdUrl = `https://api.taapi.io/macd?secret=${apiKey}&exchange=binance&symbol=${symbol}/USD&interval=${interval}`;
+
+      try {
+        const [rsiRes, macdRes] = await Promise.all([fetch(rsiUrl), fetch(macdUrl)]);
+        const rsi = (await rsiRes.json()).value;
+        const macdData = await macdRes.json();
+        const macd = macdData.valueMACD;
+        const signal = macdData.valueSignal;
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h2>${symbol}/USD</h2>
+          <p>RSI: ${rsi.toFixed(2)}</p>
+          <p>MACD: ${macd.toFixed(3)} / Signal: ${signal.toFixed(3)}</p>
+          ${rsi > 45 && rsi < 60 && macd > signal ? '<div class="suggestion">✅ توصية شراء</div>' : '<div class="no-suggestion">❌ لا توجد توصية</div>'}
+        `;
+        document.getElementById("cardsGrid").appendChild(card);
+      } catch (err) {
+        console.error("خطأ:", err);
+      }
+    }
+
+    document.getElementById("cardsGrid").innerHTML = "";
+    symbols.forEach(fetchRecommendation);
 </body>
 </html>
