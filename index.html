@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <title>📊 توصيات العملات الذكية (موثوقة فقط)</title>
+  <meta charset="UTF-8">
+  <title>📊 توصيات العملات الذكية (تلقائي بالكامل)</title>
   <script src="https://cdn.jsdelivr.net/npm/technicalindicators@3.1.1/dist/browser.js"></script>
   <style>
     body {
@@ -41,26 +41,19 @@
   </style>
 </head>
 <body>
-  <h1>📈 توصيات العملات الذكية (فلترة مدعومة + تحليل محلي)</h1>
-  <div class="grid" id="cardsGrid">جاري التحليل...</div>
+  <h1>📈 توصيات العملات الذكية (RSI + MACD + ارتفاع +5%)</h1>
+  <div class="grid" id="cardsGrid">جاري التحميل...</div>
 
   <script>
-    async function getSupportedSymbols() {
-      const info = await fetch("https://api.binance.com/api/v3/exchangeInfo").then(res => res.json());
-      return info.symbols
-        .filter(s => s.symbol.endsWith("USDT") && s.status === "TRADING")
-        .map(s => s.symbol);
-    }
-
-    async function fetchTopMovers(supported) {
+    async function fetchTopMovers() {
       const res = await fetch("https://api.binance.com/api/v3/ticker/24hr");
       const data = await res.json();
 
       const filtered = data.filter(c =>
-        supported.includes(c.symbol) &&
+        c.symbol.endsWith("USDT") &&
+        !["BUSD", "USDC", "TUSD", "USDT", "FDUSD", "DAI"].some(stable => c.symbol.startsWith(stable)) &&
         parseFloat(c.priceChangePercent) > 5 &&
-        parseFloat(c.lastPrice) > 0 &&
-        !["BUSD", "USDC", "TUSD", "USDT", "FDUSD", "DAI"].some(stable => c.symbol.startsWith(stable))
+        parseFloat(c.lastPrice) > 0
       );
 
       return filtered
@@ -77,8 +70,6 @@
     }
 
     function analyze(symbol, closes) {
-      if (!closes || closes.length < 50) return;
-
       const rsi = window.RSI.calculate({ values: closes, period: 14 });
       const macd = window.MACD.calculate({
         values: closes,
@@ -93,7 +84,7 @@
       const latestMACD = macd[macd.length - 1];
       const price = closes[closes.length - 1];
 
-      const isRSIGood = latestRSI >= 40 && latestRSI <= 70;
+      const isRSIGood = latestRSI >= 45 && latestRSI <= 60;
       const isMACDPositive = latestMACD.MACD > latestMACD.signal;
 
       if (isRSIGood && isMACDPositive) {
@@ -115,31 +106,21 @@
       }
     }
 
-    async function runFullAnalysis() {
+    async function runAutoAnalysis() {
       document.getElementById("cardsGrid").innerHTML = "جاري التحليل...";
-      const supported = await getSupportedSymbols();
-      const symbols = await fetchTopMovers(supported);
-      console.log("🧠 العملات المحددة:", symbols);
+      const symbols = await fetchTopMovers();
 
       for (let symbol of symbols) {
         try {
           const closes = await fetchCandles(symbol);
           analyze(symbol, closes);
         } catch (err) {
-          console.warn("❌", symbol, err.message);
+          console.warn("❌ فشل:", symbol, err.message);
         }
       }
     }
 
-   window.addEventListener("load", () => {
-  const waitForIndicators = setInterval(() => {
-    if (window.RSI && window.MACD) {
-      clearInterval(waitForIndicators);
-      runFullAnalysis();
-    }
-  }, 300);
-});
-
+    window.addEventListener('load', runAutoAnalysis);
   </script>
 </body>
 </html>
