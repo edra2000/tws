@@ -69,7 +69,13 @@
       return data.map(c => parseFloat(c[4])); // close prices
     }
 
-    function analyze(symbol, closes) {
+    
+function analyze(symbol, closes) {
+  if (!closes || closes.length < 50) {
+    console.warn("⚠️ شموع غير كافية:", symbol);
+    return;
+  }
+
       const rsi = window.RSI.calculate({ values: closes, period: 14 });
       const macd = window.MACD.calculate({
         values: closes,
