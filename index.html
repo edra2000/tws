@@ -117,7 +117,18 @@
     }
 
     function fetchRecommendationsFromCache() {
-      const raw = localStorage.getItem("coinData");
+    fetch("https://api.binance.com/api/v3/ticker/24hr")
+  .then(res => res.json())
+  .then(data => {
+    const filtered = data.filter(coin =>
+      parseFloat(coin.priceChangePercent) > 4 &&
+      parseFloat(coin.quoteVolume) > 2000000 &&
+      parseFloat(coin.lastPrice) < 10
+    );
+    allRecommendations = filtered;
+    applyFilter();
+  });
+
       if (!raw) {
         document.getElementById("recommendGrid").innerHTML = "<div class='recommend-card'>🚫 رجاءً افتح الصفحة الرئيسية أولاً لتفعيل التوصيات</div>";
         return;
