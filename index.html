@@ -131,7 +131,15 @@
       }
     }
 
-    window.addEventListener("load", runFullAnalysis);
+   window.addEventListener("load", () => {
+  const waitForIndicators = setInterval(() => {
+    if (window.RSI && window.MACD) {
+      clearInterval(waitForIndicators);
+      runFullAnalysis();
+    }
+  }, 300);
+});
+
   </script>
 </body>
 </html>
