@@ -1,175 +1,61 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📊 توصيات السوق</title>
+  <title>📊 توصيات العملات</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     body {
       font-family: 'Tajawal', sans-serif;
       background: #0a192f;
       color: #e6f1ff;
       margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #112240;
-      padding: 20px;
-      text-align: right;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 26px;
-    }
-    header p {
-      margin-top: 5px;
-      color: #a0aec0;
-      font-size: 14px;
-    }
-    .filters {
-      background: #0f263d;
-      padding: 15px 20px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .filters input {
-      padding: 8px 10px;
-      border-radius: 6px;
-      border: none;
-      font-size: 14px;
-    }
-    .recommend-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 15px;
       padding: 20px;
     }
-    @media (min-width: 1024px) {
-      .recommend-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-    .recommend-card {
-      background: #112240;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-    }
-    .recommend-card h2 {
-      margin: 0 0 10px;
-      font-size: 18px;
-    }
-    .recommend-card span {
-      display: block;
-      margin: 5px 0;
-      font-size: 13px;
-    }
-    .volume-bar {
-      margin-top: 8px;
-      height: 8px;
-      background: #1a2d4a;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .volume-fill {
-      height: 100%;
-      background: #00bcd4;
-    }
-    .footer {
+    h1 {
       text-align: center;
+      margin-bottom: 30px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #112240;
+      border-radius: 12px;
       padding: 20px;
-      color: #a0aec0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .card h2 {
+      font-size: 20px;
+      margin: 0 0 10px;
+    }
+    .suggestion {
+      margin-top: 10px;
+      padding: 6px;
+      border-radius: 6px;
+      background: #003c2c;
+      color: #00e676;
+      font-weight: bold;
+    }
+    .no-suggestion {
+      margin-top: 10px;
+      color: #ccc;
       font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <header>
-  <h1>📊 توصيات السوق</h1>
- <div id="cardsGrid"></div>
-    <p>العملات التي تنطبق عليها الشروط التالية:</p>
-    <ul style="font-size: 14px; color: #a0aec0; padding-right: 20px;">
-      <li>⬆️ نسبة تغير خلال 24 ساعة > 5%</li>
-      <li>💰 حجم تداول > 2000000 دولار</li>
-      <li>💵 السعر أقل من 10 دولار</li>
-    </ul>
-  </header>
-
-  <div class="filters">
-    <input type="text" id="filterInput" placeholder="ابحث عن عملة بالتوصيات...">
+  <h1>📈 توصيات العملات الذكية (RSI + MACD)</h1>
+  <div class="grid" id="cardsGrid">
+    <div>جاري تحميل التوصيات...</div>
   </div>
-
-  <div class="recommend-grid" id="recommendGrid">
-    <div class="recommend-card">جاري تحميل التوصيات...</div>
-  </div>
-
-  <div class="footer">© 2025 | فسوان كريبتو</div>
 
   <script>
-    let allRecommendations = [];
-
-    function getLiquidityScore(volume, sortedVolumes) {
-      const rank = sortedVolumes.findIndex(x => x === volume) + 1;
-      return ((sortedVolumes.length - rank) / sortedVolumes.length) * 100;
-    }
-
- function fetchRecommendationsFromBinance() {
-  fetch("https://api.binance.com/api/v3/ticker/24hr")
-    .then(res => res.json())
-    .then(data => {
-      const filtered = data.filter(coin =>
-        parseFloat(coin.priceChangePercent) > 4 &&
-        parseFloat(coin.quoteVolume) > 2000000 &&
-        parseFloat(coin.lastPrice) < 10
-      );
-      allRecommendations = filtered;
-      applyFilter();
-    })
-    .catch(() => {
-      document.getElementById("recommendGrid").innerHTML = "<div class='recommend-card'>❌ تعذر تحميل البيانات من Binance</div>";
-    });
-}
-
-
-    function applyFilter() {
-      const keyword = document.getElementById('filterInput').value.trim().toUpperCase();
-      const filtered = allRecommendations.filter(c => c.symbol.includes(keyword));
-      renderRecommendations(filtered);
-    }
-
-    function renderRecommendations(coins) {
-      const container = document.getElementById('recommendGrid');
-      if (coins.length === 0) {
-        container.innerHTML = '<div class="recommend-card">لا توجد توصيات حالياً.</div>';
-        return;
-      }
-      container.innerHTML = '';
-      const volumes = coins.map(c => parseFloat(c.quoteVolume));
-      const sortedVolumes = [...volumes].sort((a, b) => b - a);
-
-      coins.forEach(coin => {
-        const liquidityScore = Math.max(5, getLiquidityScore(parseFloat(coin.quoteVolume), sortedVolumes));
-        container.innerHTML += `
-          <div class="recommend-card">
-            <h2>${coin.symbol}</h2>
-            <span>السعر: $${parseFloat(coin.lastPrice).toFixed(4)}</span>
-            <span>التغير: ${parseFloat(coin.priceChangePercent).toFixed(2)}%</span>
-            <span>الحجم: $${parseFloat(coin.quoteVolume).toLocaleString()}</span>
-            <div class="volume-bar"><div class="volume-fill" style="width:${liquidityScore}%"></div></div>
-          </div>
-        `;
-      });
-    }
-
-    document.getElementById('filterInput').addEventListener('input', applyFilter);
-  fetchRecommendationsFromBinance();
- // سكربت التوصيات الذكية (RSI + MACD)
     const apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjgxM2Q4NWU4MDZmZjE2NTFlNjM2ZTAxIiwiaWF0IjoxNzQ2MTMxODg4LCJleHAiOjMzMjUwNTk1ODg4fQ.oiEizjwC-mbN2WLAlyo5i2Sjqin9-IOFFUkAKrP7YNM";
-    const symbols = ["BTC", "ETH", "XRP"];
+    const symbols = ["BTC", "ETH", "XRP"]; // العملات المدعومة في الخطة المجانية فقط
 
     async function fetchRecommendation(symbol) {
       const interval = "1h";
@@ -178,26 +64,32 @@
 
       try {
         const [rsiRes, macdRes] = await Promise.all([fetch(rsiUrl), fetch(macdUrl)]);
-        const rsi = (await rsiRes.json()).value;
+        const rsiData = await rsiRes.json();
         const macdData = await macdRes.json();
-        const macd = macdData.valueMACD;
-        const signal = macdData.valueSignal;
+
+        const rsi = parseFloat(rsiData.value).toFixed(2);
+        const macd = parseFloat(macdData.valueMACD).toFixed(3);
+        const signal = parseFloat(macdData.valueSignal).toFixed(3);
+
+        const isRSIGood = rsi >= 45 && rsi <= 60;
+        const isMACDPositive = parseFloat(macd) > parseFloat(signal);
 
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
           <h2>${symbol}/USD</h2>
-          <p>RSI: ${rsi.toFixed(2)}</p>
-          <p>MACD: ${macd.toFixed(3)} / Signal: ${signal.toFixed(3)}</p>
-          ${rsi > 45 && rsi < 60 && macd > signal ? '<div class="suggestion">✅ توصية شراء</div>' : '<div class="no-suggestion">❌ لا توجد توصية</div>'}
+          <p>RSI: ${rsi}</p>
+          <p>MACD: ${macd} / Signal: ${signal}</p>
+          ${isRSIGood && isMACDPositive ? '<div class="suggestion">✅ توصية شراء</div>' : '<div class="no-suggestion">❌ لا توجد توصية حالياً</div>'}
         `;
         document.getElementById("cardsGrid").appendChild(card);
-      } catch (err) {
-        console.error("خطأ:", err);
+      } catch (error) {
+        console.error("❌ خطأ أثناء جلب البيانات:", error);
       }
     }
 
     document.getElementById("cardsGrid").innerHTML = "";
     symbols.forEach(fetchRecommendation);
+  </script>
 </body>
 </html>
