@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📊 توصيات العملات (آمنة بدون ضغط)</title>
+  <title>📊 توصيات العملات الذكية (آمن جدًا)</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -48,7 +48,7 @@
   </style>
 </head>
 <body>
-  <h1>📈 توصيات العملات الذكية (بدون ضغط API)</h1>
+  <h1>📈 توصيات العملات الذكية (أمان قصوى من 429)</h1>
   <div class="grid" id="cardsGrid">
     <div>جاري تحميل التوصيات...</div>
   </div>
@@ -57,22 +57,26 @@
     const apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjgxM2Q4NWU4MDZmZjE2NTFlNjM2ZTAxIiwiaWF0IjoxNzQ2MTMxODg4LCJleHAiOjMzMjUwNTk1ODg4fQ.oiEizjwC-mbN2WLAlyo5i2Sjqin9-IOFFUkAKrP7YNM";
     const symbols = ["XRP", "LTC", "DOGE", "SOL", "TRX"];
     const interval = "1h";
-    const delayBetweenRequests = 5000; // 5 ثواني
+    const delay = 3000; // 3 ثواني تأخير بين كل طلب
 
-    async function fetchRecommendation(symbol) {
-      const rsiUrl = `https://api.taapi.io/rsi?secret=${apiKey}&exchange=binance&symbol=${symbol}/USDT&interval=${interval}`;
-      const macdUrl = `https://api.taapi.io/macd?secret=${apiKey}&exchange=binance&symbol=${symbol}/USDT&interval=${interval}`;
-      const priceUrl = `https://api.binance.com/api/v3/ticker/price?symbol=${symbol}USDT`;
+    async function delayMs(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
+    async function fetchRecommendationSafe(symbol) {
       try {
-        const [rsiRes, macdRes, priceRes] = await Promise.all([
-          fetch(rsiUrl),
-          fetch(macdUrl),
-          fetch(priceUrl)
-        ]);
-
+        const rsiUrl = `https://api.taapi.io/rsi?secret=${apiKey}&exchange=binance&symbol=${symbol}/USDT&interval=${interval}`;
+        const rsiRes = await fetch(rsiUrl);
         const rsiData = await rsiRes.json();
+        await delayMs(delay);
+
+        const macdUrl = `https://api.taapi.io/macd?secret=${apiKey}&exchange=binance&symbol=${symbol}/USDT&interval=${interval}`;
+        const macdRes = await fetch(macdUrl);
         const macdData = await macdRes.json();
+        await delayMs(delay);
+
+        const priceUrl = `https://api.binance.com/api/v3/ticker/price?symbol=${symbol}USDT`;
+        const priceRes = await fetch(priceUrl);
         const priceData = await priceRes.json();
 
         const rsi = parseFloat(rsiData.value).toFixed(2);
@@ -105,19 +109,19 @@
           document.getElementById("cardsGrid").appendChild(card);
         }
       } catch (err) {
-        console.warn(`⚠️ فشل تحميل ${symbol}:`, err.message);
+        console.warn(`⚠️ ${symbol} فشل:`, err.message);
       }
     }
 
-    async function startSequentialAnalysis() {
+    async function startSafeAnalysis() {
       document.getElementById("cardsGrid").innerHTML = "";
-      for (let i = 0; i < symbols.length; i++) {
-        await fetchRecommendation(symbols[i]);
-        await new Promise(resolve => setTimeout(resolve, delayBetweenRequests));
+      for (let symbol of symbols) {
+        await fetchRecommendationSafe(symbol);
+        await delayMs(delay); // تأخير قبل الانتقال للعملة التالية
       }
     }
 
-    startSequentialAnalysis();
+    startSafeAnalysis();
   </script>
 </body>
 </html>
