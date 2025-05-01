@@ -2,9 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📊 توصيات العملات الذكية (آمن جدًا)</title>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <title>📊 توصيات العملات الذكية (تلقائي بالكامل)</title>
+  <script src="https://cdn.jsdelivr.net/npm/technicalindicators@3.1.1/dist/browser.js"></script>
   <style>
     body {
       font-family: 'Tajawal', sans-serif;
@@ -13,10 +12,7 @@
       margin: 0;
       padding: 20px;
     }
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
+    h1 { text-align: center; margin-bottom: 20px; }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -28,10 +24,7 @@
       padding: 20px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
-    .card h2 {
-      font-size: 20px;
-      margin: 0 0 10px;
-    }
+    .card h2 { margin: 0 0 10px; font-size: 20px; }
     .suggestion {
       margin-top: 10px;
       padding: 6px;
@@ -48,80 +41,86 @@
   </style>
 </head>
 <body>
-  <h1>📈 توصيات العملات الذكية (أمان قصوى من 429)</h1>
-  <div class="grid" id="cardsGrid">
-    <div>جاري تحميل التوصيات...</div>
-  </div>
+  <h1>📈 توصيات العملات الذكية (RSI + MACD + ارتفاع +5%)</h1>
+  <div class="grid" id="cardsGrid">جاري التحميل...</div>
 
   <script>
-    const apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVlIjoiNjgxM2Q4NWU4MDZmZjE2NTFlNjM2ZTAxIiwiaWF0IjoxNzQ2MTMxODg4LCJleHAiOjMzMjUwNTk1ODg4fQ.oiEizjwC-mbN2WLAlyo5i2Sjqin9-IOFFUkAKrP7YNM";
-    const symbols = ["XRP", "LTC", "DOGE", "SOL", "TRX"];
-    const interval = "1h";
-    const delay = 3000; // 3 ثواني تأخير بين كل طلب
+    async function fetchTopMovers() {
+      const res = await fetch("https://api.binance.com/api/v3/ticker/24hr");
+      const data = await res.json();
 
-    async function delayMs(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+      const filtered = data.filter(c =>
+        c.symbol.endsWith("USDT") &&
+        !["BUSD", "USDC", "TUSD", "USDT", "FDUSD", "DAI"].some(stable => c.symbol.startsWith(stable)) &&
+        parseFloat(c.priceChangePercent) > 5 &&
+        parseFloat(c.lastPrice) > 0
+      );
+
+      return filtered
+        .sort((a, b) => parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent))
+        .slice(0, 30)
+        .map(c => c.symbol);
     }
 
-    async function fetchRecommendationSafe(symbol) {
-      try {
-        const rsiUrl = `https://api.taapi.io/rsi?secret=${apiKey}&exchange=binance&symbol=${symbol}/USDT&interval=${interval}`;
-        const rsiRes = await fetch(rsiUrl);
-        const rsiData = await rsiRes.json();
-        await delayMs(delay);
+    async function fetchCandles(symbol) {
+      const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1h&limit=100`;
+      const res = await fetch(url);
+      const data = await res.json();
+      return data.map(c => parseFloat(c[4])); // close prices
+    }
 
-        const macdUrl = `https://api.taapi.io/macd?secret=${apiKey}&exchange=binance&symbol=${symbol}/USDT&interval=${interval}`;
-        const macdRes = await fetch(macdUrl);
-        const macdData = await macdRes.json();
-        await delayMs(delay);
+    function analyze(symbol, closes) {
+      const rsi = window.RSI.calculate({ values: closes, period: 14 });
+      const macd = window.MACD.calculate({
+        values: closes,
+        fastPeriod: 12,
+        slowPeriod: 26,
+        signalPeriod: 9,
+        SimpleMAOscillator: false,
+        SimpleMASignal: false
+      });
 
-        const priceUrl = `https://api.binance.com/api/v3/ticker/price?symbol=${symbol}USDT`;
-        const priceRes = await fetch(priceUrl);
-        const priceData = await priceRes.json();
+      const latestRSI = rsi[rsi.length - 1];
+      const latestMACD = macd[macd.length - 1];
+      const price = closes[closes.length - 1];
 
-        const rsi = parseFloat(rsiData.value).toFixed(2);
-        const macd = parseFloat(macdData.valueMACD).toFixed(3);
-        const signal = parseFloat(macdData.valueSignal).toFixed(3);
-        const price = parseFloat(priceData.price).toFixed(4);
+      const isRSIGood = latestRSI >= 45 && latestRSI <= 60;
+      const isMACDPositive = latestMACD.MACD > latestMACD.signal;
 
-        const isRSIGood = rsi >= 45 && rsi <= 60;
-        const isMACDPositive = macd > signal;
-
-        if (isRSIGood && isMACDPositive) {
-          const target1 = (price * 1.05).toFixed(4);
-          const target2 = (price * 1.10).toFixed(4);
-          const resistance = (price * 1.03).toFixed(4);
-
-          const card = document.createElement("div");
-          card.className = "card";
-          card.innerHTML = `
-            <h2>${symbol}/USDT</h2>
-            <p>RSI: ${rsi}</p>
-            <p>MACD: ${macd} / Signal: ${signal}</p>
-            <div class="details">
-              <strong>السعر الحالي:</strong> $${price}<br>
-              <strong>مقاومة قريبة:</strong> $${resistance}<br>
-              <strong>الهدف 1:</strong> $${target1}<br>
-              <strong>الهدف 2:</strong> $${target2}
-            </div>
-            <div class="suggestion">✅ توصية شراء</div>
-          `;
-          document.getElementById("cardsGrid").appendChild(card);
-        }
-      } catch (err) {
-        console.warn(`⚠️ ${symbol} فشل:`, err.message);
+      if (isRSIGood && isMACDPositive) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h2>${symbol}</h2>
+          <p>RSI: ${latestRSI.toFixed(2)}</p>
+          <p>MACD: ${latestMACD.MACD.toFixed(3)} / Signal: ${latestMACD.signal.toFixed(3)}</p>
+          <div class="details">
+            <strong>السعر الحالي:</strong> $${price.toFixed(4)}<br>
+            <strong>مقاومة:</strong> $${(price * 1.03).toFixed(4)}<br>
+            <strong>الهدف 1:</strong> $${(price * 1.05).toFixed(4)}<br>
+            <strong>الهدف 2:</strong> $${(price * 1.10).toFixed(4)}
+          </div>
+          <div class="suggestion">✅ توصية شراء</div>
+        `;
+        document.getElementById("cardsGrid").appendChild(card);
       }
     }
 
-    async function startSafeAnalysis() {
-      document.getElementById("cardsGrid").innerHTML = "";
+    async function runAutoAnalysis() {
+      document.getElementById("cardsGrid").innerHTML = "جاري التحليل...";
+      const symbols = await fetchTopMovers();
+
       for (let symbol of symbols) {
-        await fetchRecommendationSafe(symbol);
-        await delayMs(delay); // تأخير قبل الانتقال للعملة التالية
+        try {
+          const closes = await fetchCandles(symbol);
+          analyze(symbol, closes);
+        } catch (err) {
+          console.warn("❌ فشل:", symbol, err.message);
+        }
       }
     }
 
-    startSafeAnalysis();
+    runAutoAnalysis();
   </script>
 </body>
 </html>
