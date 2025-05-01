@@ -116,34 +116,23 @@
       return ((sortedVolumes.length - rank) / sortedVolumes.length) * 100;
     }
 
-    function fetchRecommendationsFromCache() {
-    fetch("https://api.binance.com/api/v3/ticker/24hr")
-  .then(res => res.json())
-  .then(data => {
-    const filtered = data.filter(coin =>
-      parseFloat(coin.priceChangePercent) > 4 &&
-      parseFloat(coin.quoteVolume) > 2000000 &&
-      parseFloat(coin.lastPrice) < 10
-    );
-    allRecommendations = filtered;
-    applyFilter();
-  });
-
-      if (!raw) {
-        document.getElementById("recommendGrid").innerHTML = "<div class='recommend-card'>🚫 رجاءً افتح الصفحة الرئيسية أولاً لتفعيل التوصيات</div>";
-        return;
-      }
-
-      const data = JSON.parse(raw);
+ function fetchRecommendationsFromBinance() {
+  fetch("https://api.binance.com/api/v3/ticker/24hr")
+    .then(res => res.json())
+    .then(data => {
       const filtered = data.filter(coin =>
-        parseFloat(coin.priceChangePercent) > 5 &&
+        parseFloat(coin.priceChangePercent) > 4 &&
         parseFloat(coin.quoteVolume) > 2000000 &&
         parseFloat(coin.lastPrice) < 10
       );
-
       allRecommendations = filtered;
       applyFilter();
-    }
+    })
+    .catch(() => {
+      document.getElementById("recommendGrid").innerHTML = "<div class='recommend-card'>❌ تعذر تحميل البيانات من Binance</div>";
+    });
+}
+
 
     function applyFilter() {
       const keyword = document.getElementById('filterInput').value.trim().toUpperCase();
@@ -176,7 +165,7 @@
     }
 
     document.getElementById('filterInput').addEventListener('input', applyFilter);
-    fetchRecommendationsFromCache();
-  </script>
+  fetchRecommendationsFromBinance();
+
 </body>
 </html>
