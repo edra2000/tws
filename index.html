@@ -90,7 +90,7 @@ function analyze(symbol, closes) {
       const latestMACD = macd[macd.length - 1];
       const price = closes[closes.length - 1];
 
-      const isRSIGood = latestRSI >= 45 && latestRSI <= 60;
+      const isRSIGood = latestRSI >= 40 && latestRSI <= 70;
       const isMACDPositive = latestMACD.MACD > latestMACD.signal;
 
       if (isRSIGood && isMACDPositive) {
@@ -108,18 +108,26 @@ function analyze(symbol, closes) {
           </div>
           <div class="suggestion">✅ توصية شراء</div>
         `;
-        document.getElementById("cardsGrid").appendChild(card);
+        document.getElementById("cardsGrid").appendChild(card); shown++;
       }
     }
 
     async function runAutoAnalysis() {
-      document.getElementById("cardsGrid").innerHTML = "جاري التحليل...";
+      
+document.getElementById("cardsGrid").innerHTML = "جاري التحليل...";
+let analyzed = 0;
+let shown = 0;
+
       const symbols = await fetchTopMovers();
 
       for (let symbol of symbols) {
         try {
           const closes = await fetchCandles(symbol);
-          analyze(symbol, closes);
+          
+analyzed++;
+console.log(`🔍 ${symbol}: RSI ${window.RSI.calculate({ values: closes, period: 14 }).slice(-1)[0]?.toFixed(2)}, MACD ${window.MACD.calculate({ values: closes, fastPeriod: 12, slowPeriod: 26, signalPeriod: 9 }).slice(-1)[0]?.MACD?.toFixed(2)}`);
+analyze(symbol, closes);
+
         } catch (err) {
           console.warn("❌ فشل:", symbol, err.message);
         }
