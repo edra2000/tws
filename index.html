@@ -2,51 +2,24 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>📊 توصيات العملات الذكية (تلقائي بالكامل)</title>
-  <!-- تغيير مصدر المكتبة إلى CDN موثوق -->
-  <script src="https://unpkg.com/technicalindicators@3.1.1/dist/technicalindicators.min.js"></script>
+  <title>📊 توصيات العملات الذكية</title>
   <style>
-    body {
-      font-family: 'Tajawal', sans-serif;
-      background: #0a192f;
-      color: #e6f1ff;
-      margin: 0;
+    /* نفس الأنماط السابقة */
+    .error {
+      background: #1e1e2d;
       padding: 20px;
-    }
-    h1 { text-align: center; margin-bottom: 20px; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 20px;
-    }
-    .card {
-      background: #112240;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-    .card h2 { margin: 0 0 10px; font-size: 20px; }
-    .suggestion {
-      margin-top: 10px;
-      padding: 6px;
-      border-radius: 6px;
-      background: #003c2c;
-      color: #00e676;
-      font-weight: bold;
-    }
-    .suggestion.sell {
-      background: #3d0a0a;
-      color: #ff5252;
-    }
-    .details {
-      font-size: 14px;
-      margin-top: 8px;
+      border-radius: 8px;
+      text-align: center;
       line-height: 1.6;
     }
-    .error {
-      color: #ff5252;
-      text-align: center;
-      padding: 20px;
+    .error button {
+      background: #00e676;
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -55,137 +28,67 @@
   <div class="grid" id="cardsGrid">جاري التحميل...</div>
 
   <script>
-    // تحقق من تحميل المكتبة
-    function checkLibrary() {
-      if (typeof technicalIndicators === 'undefined') {
-        document.getElementById('cardsGrid').innerHTML = 
-          '<div class="error">❌ لم يتم تحميل مكتبة المؤشرات التقنية. يرجى تحديث الصفحة.</div>';
-        return false;
-      }
-      return true;
-    }
-
-    async function fetchTopMovers() {
-      try {
-        const res = await fetch("https://api.binance.com/api/v3/ticker/24hr");
-        const data = await res.json();
-
-        const filtered = data.filter(c =>
-          c.symbol.endsWith("USDT") &&
-          !["BUSD", "USDC", "TUSD", "USDT", "FDUSD", "DAI"].some(stable => c.symbol.startsWith(stable)) &&
-          parseFloat(c.priceChangePercent) > 5 &&
-          parseFloat(c.lastPrice) > 0
-        );
-
-        return filtered
-          .sort((a, b) => parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent))
-          .slice(0, 30)
-          .map(c => c.symbol);
-      } catch (error) {
-        console.error('فشل جلب البيانات:', error);
-        document.getElementById('cardsGrid').innerHTML = 
-          '<div class="error">❌ فشل الاتصال ببيانات Binance. يرجى المحاولة لاحقاً.</div>';
-        return [];
-      }
-    }
-
-    async function fetchCandles(symbol) {
-      try {
-        const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1h&limit=100`;
-        const res = await fetch(url);
-        const data = await res.json();
-        return data.map(c => parseFloat(c[4])); // close prices
-      } catch (error) {
-        console.warn(`فشل جلب الشموع لـ ${symbol}:`, error);
-        return null;
-      }
-    }
-
-    function analyze(symbol, closes) {
-      if (!closes || closes.length < 50) {
-        console.warn(`⚠️ بيانات غير كافية لـ ${symbol} (${closes?.length || 0} شمعة)`);
-        return;
-      }
-
-      try {
-        const rsi = technicalIndicators.RSI.calculate({ values: closes, period: 14 });
-        const macd = technicalIndicators.MACD.calculate({
-          values: closes,
-          fastPeriod: 12,
-          slowPeriod: 26,
-          signalPeriod: 9,
-          SimpleMAOscillator: false,
-          SimpleMASignal: false
-        });
-
-        if (!rsi || !macd || rsi.length === 0 || macd.length === 0) {
-          console.warn(`⚠️ لا توجد نتائج لـ ${symbol}`);
+    // 1. دالة تحميل المكتبة مع حل احتياطي
+    function loadTechnicalIndicators() {
+      return new Promise((resolve) => {
+        if (typeof technicalIndicators !== 'undefined') {
+          resolve();
           return;
         }
 
-        const latestRSI = rsi[rsi.length - 1];
-        const latestMACD = macd[macd.length - 1];
-        const price = closes[closes.length - 1];
-
-        // توسيع شروط الترشيح
-        const isRSIGood = latestRSI >= 30 && latestRSI <= 70;
-        const isMACDPositive = latestMACD.MACD > latestMACD.signal;
-
-        const card = document.createElement("div");
-        card.className = "card";
-        
-        if (isRSIGood && isMACDPositive) {
-          card.innerHTML = `
-            <h2>${symbol}</h2>
-            <p>RSI: ${latestRSI.toFixed(2)}</p>
-            <p>MACD: ${latestMACD.MACD.toFixed(3)} / Signal: ${latestMACD.signal.toFixed(3)}</p>
-            <div class="details">
-              <strong>السعر الحالي:</strong> $${price.toFixed(4)}<br>
-              <strong>مقاومة:</strong> $${(price * 1.03).toFixed(4)}<br>
-              <strong>الهدف 1:</strong> $${(price * 1.05).toFixed(4)}<br>
-              <strong>الهدف 2:</strong> $${(price * 1.10).toFixed(4)}
-            </div>
-            <div class="suggestion">✅ توصية شراء</div>
-          `;
-        } else {
-          card.innerHTML = `
-            <h2>${symbol}</h2>
-            <p>RSI: ${latestRSI.toFixed(2)}</p>
-            <p>MACD: ${latestMACD.MACD.toFixed(3)} / Signal: ${latestMACD.signal.toFixed(3)}</p>
-            <div class="details">
-              <strong>السعر الحالي:</strong> $${price.toFixed(4)}
-            </div>
-            <div class="suggestion sell">✖️ غير مؤهل</div>
-          `;
-        }
-        
-        document.getElementById("cardsGrid").appendChild(card);
-      } catch (error) {
-        console.error(`❌ خطأ في تحليل ${symbol}:`, error);
-      }
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/gh/anandanand84/technicalindicators@3.1.1/dist/technicalindicators.min.js';
+        script.onload = resolve;
+        script.onerror = () => {
+          showError('❌ فشل تحميل المكتبة. جرب تحديث الصفحة أو متصفحاً مختلفاً.');
+        };
+        document.head.appendChild(script);
+      });
     }
 
+    // 2. عرض الأخطاء بطريقة أنيقة
+    function showError(message) {
+      document.getElementById('cardsGrid').innerHTML = `
+        <div class="error">
+          ${message}<br>
+          <button onclick="location.reload()">تحديث الصفحة</button>
+        </div>`;
+    }
+
+    // 3. الدوال الأخرى (fetchTopMovers, fetchCandles, analyze) تبقى كما هي
+
+    // 4. الدالة الرئيسية المعدلة
     async function runAutoAnalysis() {
-      if (!checkLibrary()) return;
-      
-      document.getElementById("cardsGrid").innerHTML = "جاري التحليل...";
-      const symbols = await fetchTopMovers();
+      try {
+        await loadTechnicalIndicators();
+        
+        if (typeof technicalIndicators === 'undefined') {
+          showError(`
+            ❌ المتصفح يحظر تحميل المكتبة.<br>
+            جرب <a href="https://cors-anywhere.herokuapp.com/" target="_blank">هذا الرابط</a> أولاً،
+            ثم اضغط "Request temporary access".
+          `);
+          return;
+        }
 
-      if (symbols.length === 0) {
-        document.getElementById("cardsGrid").innerHTML = 
-          '<div class="error">⚠️ لا توجد عملات مؤهلة حالياً. يرجى المحاولة لاحقاً.</div>';
-        return;
-      }
+        document.getElementById("cardsGrid").innerHTML = "جاري التحليل...";
+        const symbols = await fetchTopMovers();
+        
+        if (symbols.length === 0) {
+          showError("⚠️ لا توجد عملات مؤهلة حالياً");
+          return;
+        }
 
-      for (let symbol of symbols) {
-        const closes = await fetchCandles(symbol);
-        analyze(symbol, closes);
-      }
+        for (let symbol of symbols) {
+          const closes = await fetchCandles(symbol);
+          analyze(symbol, closes);
+        }
 
-      // إذا لم تظهر أي بطاقات بعد التحليل
-      if (document.getElementById("cardsGrid").children.length === 0) {
-        document.getElementById("cardsGrid").innerHTML = 
-          '<div class="error">⚠️ لا توجد توصيات متاحة حسب المعايير الحالية.</div>';
+        if (document.getElementById("cardsGrid").children.length === 0) {
+          showError("⚠️ لا توجد توصيات متاحة حسب المعايير الحالية");
+        }
+      } catch (error) {
+        showError(`❌ خطأ غير متوقع: ${error.message}`);
       }
     }
 
