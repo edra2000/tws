@@ -8,12 +8,15 @@
   <style>
     :root {
       --primary: #1a73e8;
-      --secondary: #f8f9fa;
-      --dark: #202124;
-      --light: #ffffff;
+      --primary-dark: #0d47a1;
+      --secondary: #ffffff;
+      --text: #333333;
+      --text-light: #666666;
+      --border: #e0e0e0;
       --success: #34a853;
       --danger: #ea4335;
       --warning: #fbbc05;
+      --info: #1a73e8;
     }
     
     * {
@@ -25,7 +28,7 @@
     
     body {
       background-color: var(--secondary);
-      color: var(--dark);
+      color: var(--text);
       line-height: 1.6;
     }
     
@@ -37,7 +40,7 @@
     
     /* Header Styles */
     header {
-      background: linear-gradient(135deg, var(--primary), #0d47a1);
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
       color: white;
       padding: 1rem 0;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -55,18 +58,25 @@
     }
     
     .logo img {
-      height: 50px;
+      height: 40px;
       margin-left: 10px;
     }
     
     .logo-text {
-      font-size: 1.8rem;
+      font-size: 1.5rem;
       font-weight: 700;
+      color: white;
+    }
+    
+    .last-update {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.9);
     }
     
     /* Main Content */
     .main-content {
       padding: 2rem 0;
+      background-color: var(--secondary);
     }
     
     .section-title {
@@ -80,39 +90,40 @@
     /* Crypto Cards */
     .crypto-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 20px;
     }
     
     .crypto-card {
       background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       overflow: hidden;
-      transition: transform 0.3s ease;
+      transition: all 0.3s ease;
+      border: 1px solid var(--border);
     }
     
     .crypto-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
     
     .card-header {
       background: var(--primary);
       color: white;
-      padding: 15px;
+      padding: 12px 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     
     .coin-name {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       font-weight: 700;
     }
     
     .coin-price {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 600;
     }
     
@@ -123,18 +134,25 @@
     .info-row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 10px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #eee;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed var(--border);
+    }
+    
+    .info-row:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
     }
     
     .info-label {
-      color: #666;
-      font-weight: 500;
+      color: var(--text-light);
+      font-size: 0.9rem;
     }
     
     .info-value {
       font-weight: 600;
+      font-size: 0.95rem;
     }
     
     .target-price {
@@ -149,7 +167,11 @@
       color: var(--primary);
     }
     
-    .liquidity {
+    .stop-loss {
+      color: var(--danger);
+    }
+    
+    .liquidity-badge {
       display: inline-block;
       padding: 3px 8px;
       border-radius: 4px;
@@ -157,27 +179,34 @@
       font-weight: 500;
     }
     
-    .high {
+    .high-liquidity {
       background: rgba(52, 168, 83, 0.1);
       color: var(--success);
     }
     
-    .medium {
+    .medium-liquidity {
       background: rgba(251, 188, 5, 0.1);
       color: var(--warning);
     }
     
     /* Footer */
     footer {
-      background: var(--dark);
+      background: var(--primary);
       color: white;
-      padding: 2rem 0;
+      padding: 1.5rem 0;
       text-align: center;
       margin-top: 2rem;
     }
     
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
     .footer-logo {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
+      font-weight: 700;
       margin-bottom: 1rem;
     }
     
@@ -188,15 +217,28 @@
     .social-links a {
       color: white;
       margin: 0 10px;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
+      transition: opacity 0.3s;
+    }
+    
+    .social-links a:hover {
+      opacity: 0.8;
+    }
+    
+    .copyright {
+      font-size: 0.85rem;
+      opacity: 0.9;
     }
     
     /* Loading State */
     .loading {
       text-align: center;
       padding: 2rem;
-      font-size: 1.2rem;
-      color: #666;
+      color: var(--text-light);
+    }
+    
+    .loading i {
+      margin-left: 8px;
     }
     
     /* Responsive */
@@ -212,6 +254,11 @@
       
       .logo {
         margin-bottom: 10px;
+        justify-content: center;
+      }
+      
+      .last-update {
+        margin-top: 8px;
       }
     }
   </style>
@@ -220,7 +267,7 @@
   <header>
     <div class="container header-content">
       <div class="logo">
-        <img src="https://via.placeholder.com/50x50" alt="إدرة ون">
+        <img src="https://1.bp.blogspot.com/-Yq3jYf6sR3k/YJfzqG8n7_I/AAAAAAAAAEs/5ZR3pWQzEf4QdJk8v5FQ2XQ6XZJ1X9XwCLcBGAsYHQ/s320/%25D8%25A5%25D8%25AF%25D8%25B1%25D8%25A9%2B%25D9%2588%25D9%2586%2B%25D9%2584%25D9%2588%25D8%25BA%25D9%2588.png" alt="إدرة ون">
         <span class="logo-text">إدرة ون</span>
       </div>
       <div class="last-update">آخر تحديث: <span id="update-time"></span></div>
@@ -229,7 +276,7 @@
   
   <main class="main-content">
     <div class="container">
-      <h2 class="section-title">توصيات اليوم</h2>
+      <h2 class="section-title">توصيات العملات الرقمية</h2>
       
       <div class="crypto-grid" id="crypto-grid">
         <div class="loading">
@@ -240,14 +287,14 @@
   </main>
   
   <footer>
-    <div class="container">
+    <div class="container footer-content">
       <div class="footer-logo">إدرة ون</div>
       <div class="social-links">
         <a href="#"><i class="fab fa-telegram"></i></a>
         <a href="#"><i class="fab fa-twitter"></i></a>
         <a href="#"><i class="fab fa-instagram"></i></a>
       </div>
-      <p>© 2023 جميع الحقوق محفوظة</p>
+      <p class="copyright">© 2023 جميع الحقوق محفوظة لـ إدرة ون</p>
     </div>
   </footer>
 
@@ -329,9 +376,12 @@
         return data
           .filter(c => 
             c.symbol.endsWith('USDT') && 
-            parseFloat(c.priceChangePercent) > 5
+            parseFloat(c.priceChangePercent) > 3 && // تغيير إلى 3% لأغراض العرض
+            !c.symbol.includes('UP') &&
+            !c.symbol.includes('DOWN')
           )
-          .slice(0, 12);
+          .sort((a, b) => parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent))
+          .slice(0, 12); // عرض 12 عملة فقط لأغراض العرض
       } catch (error) {
         console.error('فشل جلب البيانات:', error);
         return [];
@@ -356,22 +406,27 @@
         const latestMACD = macd[macd.length - 1];
         const currentPrice = closes[closes.length - 1];
         
-        // حساب الأهداف والمقاومات بناء على التحليل الفني
+        // حساب الأهداف والمقاومات ووقف الخسارة
         const entryPrice = currentPrice;
-        const target1 = currentPrice * 1.05;
-        const target2 = currentPrice * 1.10;
-        const resistance1 = currentPrice * 1.03;
+        const stopLoss = currentPrice * 0.97; // وقف خسارة 3%
+        const target1 = currentPrice * 1.05;  // هدف 5%
+        const target2 = currentPrice * 1.08;  // هدف 8%
+        const resistance = currentPrice * 1.03; // مقاومة 3%
         
         // تحديد السيولة (عشوائي لأغراض العرض)
-        const liquidity = Math.random() > 0.7 ? 'high' : 'medium';
+        const liquidityScore = Math.random();
+        const liquidity = liquidityScore > 0.7 ? 'high' : 'medium';
+        const liquidityText = liquidityScore > 0.7 ? 'عالية' : 'متوسطة';
 
         return {
           symbol,
           price: currentPrice,
           entry: entryPrice,
+          stopLoss: stopLoss,
           targets: [target1, target2],
-          resistance: resistance1,
-          liquidity
+          resistance: resistance,
+          liquidity: liquidity,
+          liquidityText: liquidityText
         };
       } catch (error) {
         console.error(`خطأ في تحليل ${symbol}:`, error);
@@ -386,9 +441,8 @@
       
       if (results.length === 0) {
         grid.innerHTML = `
-          <div class="error">
-            ⚠️ لا توجد توصيات متاحة اليوم
-            <button class="refresh-btn" onclick="runAnalysis()">إعادة المحاولة</button>
+          <div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light)">
+            لا توجد توصيات متاحة حالياً، يرجى المحاولة لاحقاً
           </div>`;
         return;
       }
@@ -408,6 +462,10 @@
               <span class="info-value entry">$${item.entry.toFixed(4)}</span>
             </div>
             <div class="info-row">
+              <span class="info-label">وقف الخسارة</span>
+              <span class="info-value stop-loss">$${item.stopLoss.toFixed(4)}</span>
+            </div>
+            <div class="info-row">
               <span class="info-label">أقرب مقاومة</span>
               <span class="info-value resistance">$${item.resistance.toFixed(4)}</span>
             </div>
@@ -421,9 +479,11 @@
             </div>
             <div class="info-row">
               <span class="info-label">مستوى السيولة</span>
-              <span class="info-value"><span class="liquidity ${item.liquidity}">
-                ${item.liquidity === 'high' ? 'عالية' : 'متوسطة'}
-              </span></span>
+              <span class="info-value">
+                <span class="liquidity-badge ${item.liquidity}-liquidity">
+                  ${item.liquidityText}
+                </span>
+              </span>
             </div>
           </div>
         `;
@@ -432,7 +492,14 @@
       });
       
       // تحديث وقت التحديث الأخير
-      document.getElementById('update-time').textContent = new Date().toLocaleString('ar-EG');
+      const now = new Date();
+      document.getElementById('update-time').textContent = now.toLocaleString('ar-EG', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
     }
 
     // 5. الدالة الرئيسية
@@ -465,9 +532,17 @@
         displayResults(results);
       } catch (error) {
         document.getElementById('crypto-grid').innerHTML = `
-          <div class="error">
-            ❌ حدث خطأ في تحميل البيانات
-            <button class="refresh-btn" onclick="runAnalysis()">إعادة المحاولة</button>
+          <div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--danger)">
+            <p>حدث خطأ في تحميل البيانات</p>
+            <button onclick="runAnalysis()" style="
+              background: var(--primary);
+              color: white;
+              border: none;
+              padding: 8px 20px;
+              border-radius: 4px;
+              margin-top: 10px;
+              cursor: pointer;
+            ">إعادة المحاولة</button>
           </div>`;
       }
     }
