@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>📊 توصيات العملات الذكية (تلقائي بالكامل)</title>
-  <script src="https://cdn.jsdelivr.net/npm/technicalindicators@3.1.1/dist/browser.js"></script>
+  <!-- تغيير مصدر المكتبة إلى CDN موثوق -->
+  <script src="https://unpkg.com/technicalindicators@3.1.1/dist/technicalindicators.min.js"></script>
   <style>
     body {
       font-family: 'Tajawal', sans-serif;
@@ -33,10 +34,19 @@
       color: #00e676;
       font-weight: bold;
     }
+    .suggestion.sell {
+      background: #3d0a0a;
+      color: #ff5252;
+    }
     .details {
       font-size: 14px;
       margin-top: 8px;
       line-height: 1.6;
+    }
+    .error {
+      color: #ff5252;
+      text-align: center;
+      padding: 20px;
     }
   </style>
 </head>
@@ -45,78 +55,137 @@
   <div class="grid" id="cardsGrid">جاري التحميل...</div>
 
   <script>
+    // تحقق من تحميل المكتبة
+    function checkLibrary() {
+      if (typeof technicalIndicators === 'undefined') {
+        document.getElementById('cardsGrid').innerHTML = 
+          '<div class="error">❌ لم يتم تحميل مكتبة المؤشرات التقنية. يرجى تحديث الصفحة.</div>';
+        return false;
+      }
+      return true;
+    }
+
     async function fetchTopMovers() {
-      const res = await fetch("https://api.binance.com/api/v3/ticker/24hr");
-      const data = await res.json();
+      try {
+        const res = await fetch("https://api.binance.com/api/v3/ticker/24hr");
+        const data = await res.json();
 
-      const filtered = data.filter(c =>
-        c.symbol.endsWith("USDT") &&
-        !["BUSD", "USDC", "TUSD", "USDT", "FDUSD", "DAI"].some(stable => c.symbol.startsWith(stable)) &&
-        parseFloat(c.priceChangePercent) > 5 &&
-        parseFloat(c.lastPrice) > 0
-      );
+        const filtered = data.filter(c =>
+          c.symbol.endsWith("USDT") &&
+          !["BUSD", "USDC", "TUSD", "USDT", "FDUSD", "DAI"].some(stable => c.symbol.startsWith(stable)) &&
+          parseFloat(c.priceChangePercent) > 5 &&
+          parseFloat(c.lastPrice) > 0
+        );
 
-      return filtered
-        .sort((a, b) => parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent))
-        .slice(0, 30)
-        .map(c => c.symbol);
+        return filtered
+          .sort((a, b) => parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent))
+          .slice(0, 30)
+          .map(c => c.symbol);
+      } catch (error) {
+        console.error('فشل جلب البيانات:', error);
+        document.getElementById('cardsGrid').innerHTML = 
+          '<div class="error">❌ فشل الاتصال ببيانات Binance. يرجى المحاولة لاحقاً.</div>';
+        return [];
+      }
     }
 
     async function fetchCandles(symbol) {
-      const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1h&limit=100`;
-      const res = await fetch(url);
-      const data = await res.json();
-      return data.map(c => parseFloat(c[4])); // close prices
+      try {
+        const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1h&limit=100`;
+        const res = await fetch(url);
+        const data = await res.json();
+        return data.map(c => parseFloat(c[4])); // close prices
+      } catch (error) {
+        console.warn(`فشل جلب الشموع لـ ${symbol}:`, error);
+        return null;
+      }
     }
 
     function analyze(symbol, closes) {
-      const rsi = window.RSI.calculate({ values: closes, period: 14 });
-      const macd = window.MACD.calculate({
-        values: closes,
-        fastPeriod: 12,
-        slowPeriod: 26,
-        signalPeriod: 9,
-        SimpleMAOscillator: false,
-        SimpleMASignal: false
-      });
+      if (!closes || closes.length < 50) {
+        console.warn(`⚠️ بيانات غير كافية لـ ${symbol} (${closes?.length || 0} شمعة)`);
+        return;
+      }
 
-      const latestRSI = rsi[rsi.length - 1];
-      const latestMACD = macd[macd.length - 1];
-      const price = closes[closes.length - 1];
+      try {
+        const rsi = technicalIndicators.RSI.calculate({ values: closes, period: 14 });
+        const macd = technicalIndicators.MACD.calculate({
+          values: closes,
+          fastPeriod: 12,
+          slowPeriod: 26,
+          signalPeriod: 9,
+          SimpleMAOscillator: false,
+          SimpleMASignal: false
+        });
 
-      const isRSIGood = latestRSI >= 45 && latestRSI <= 60;
-      const isMACDPositive = latestMACD.MACD > latestMACD.signal;
+        if (!rsi || !macd || rsi.length === 0 || macd.length === 0) {
+          console.warn(`⚠️ لا توجد نتائج لـ ${symbol}`);
+          return;
+        }
 
-      if (isRSIGood && isMACDPositive) {
+        const latestRSI = rsi[rsi.length - 1];
+        const latestMACD = macd[macd.length - 1];
+        const price = closes[closes.length - 1];
+
+        // توسيع شروط الترشيح
+        const isRSIGood = latestRSI >= 30 && latestRSI <= 70;
+        const isMACDPositive = latestMACD.MACD > latestMACD.signal;
+
         const card = document.createElement("div");
         card.className = "card";
-        card.innerHTML = `
-          <h2>${symbol}</h2>
-          <p>RSI: ${latestRSI.toFixed(2)}</p>
-          <p>MACD: ${latestMACD.MACD.toFixed(3)} / Signal: ${latestMACD.signal.toFixed(3)}</p>
-          <div class="details">
-            <strong>السعر الحالي:</strong> $${price.toFixed(4)}<br>
-            <strong>مقاومة:</strong> $${(price * 1.03).toFixed(4)}<br>
-            <strong>الهدف 1:</strong> $${(price * 1.05).toFixed(4)}<br>
-            <strong>الهدف 2:</strong> $${(price * 1.10).toFixed(4)}
-          </div>
-          <div class="suggestion">✅ توصية شراء</div>
-        `;
+        
+        if (isRSIGood && isMACDPositive) {
+          card.innerHTML = `
+            <h2>${symbol}</h2>
+            <p>RSI: ${latestRSI.toFixed(2)}</p>
+            <p>MACD: ${latestMACD.MACD.toFixed(3)} / Signal: ${latestMACD.signal.toFixed(3)}</p>
+            <div class="details">
+              <strong>السعر الحالي:</strong> $${price.toFixed(4)}<br>
+              <strong>مقاومة:</strong> $${(price * 1.03).toFixed(4)}<br>
+              <strong>الهدف 1:</strong> $${(price * 1.05).toFixed(4)}<br>
+              <strong>الهدف 2:</strong> $${(price * 1.10).toFixed(4)}
+            </div>
+            <div class="suggestion">✅ توصية شراء</div>
+          `;
+        } else {
+          card.innerHTML = `
+            <h2>${symbol}</h2>
+            <p>RSI: ${latestRSI.toFixed(2)}</p>
+            <p>MACD: ${latestMACD.MACD.toFixed(3)} / Signal: ${latestMACD.signal.toFixed(3)}</p>
+            <div class="details">
+              <strong>السعر الحالي:</strong> $${price.toFixed(4)}
+            </div>
+            <div class="suggestion sell">✖️ غير مؤهل</div>
+          `;
+        }
+        
         document.getElementById("cardsGrid").appendChild(card);
+      } catch (error) {
+        console.error(`❌ خطأ في تحليل ${symbol}:`, error);
       }
     }
 
     async function runAutoAnalysis() {
+      if (!checkLibrary()) return;
+      
       document.getElementById("cardsGrid").innerHTML = "جاري التحليل...";
       const symbols = await fetchTopMovers();
 
+      if (symbols.length === 0) {
+        document.getElementById("cardsGrid").innerHTML = 
+          '<div class="error">⚠️ لا توجد عملات مؤهلة حالياً. يرجى المحاولة لاحقاً.</div>';
+        return;
+      }
+
       for (let symbol of symbols) {
-        try {
-          const closes = await fetchCandles(symbol);
-          analyze(symbol, closes);
-        } catch (err) {
-          console.warn("❌ فشل:", symbol, err.message);
-        }
+        const closes = await fetchCandles(symbol);
+        analyze(symbol, closes);
+      }
+
+      // إذا لم تظهر أي بطاقات بعد التحليل
+      if (document.getElementById("cardsGrid").children.length === 0) {
+        document.getElementById("cardsGrid").innerHTML = 
+          '<div class="error">⚠️ لا توجد توصيات متاحة حسب المعايير الحالية.</div>';
       }
     }
 
