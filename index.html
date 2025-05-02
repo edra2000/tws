@@ -1,385 +1,280 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang='ar' dir='rtl'>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ياسر كريبتو | إدرة ون | ياسر كريبتو الرقمية</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-<style>
-  body {
-    background: #0a192f;
-    color: #e6f1ff;
-    font-family: 'Tajawal', sans-serif;
-    margin: 0;
-    padding: 0;
-  }
-  header {
-    background: linear-gradient(135deg, #112240 0%, #0a192f 100%);
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  }
-  header img {
-    height: 60px;
-    margin-bottom: 10px;
-  }
-  h1 {
-    font-size: 28px;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-    padding: 30px;
-  }
-  .card {
-    background: #112240;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-  .card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.3);
-  }
-  .card h2 {
-    color: #64ffda;
-    margin-bottom: 8px;
-  }
-  .details {
-    font-size: 14px;
-    margin-top: 12px;
-  }
-  .suggestion {
-    margin-top: 10px;
-    display: inline-block;
-    padding: 6px 10px;
-    border-radius: 6px;
-    background: rgba(0, 200, 83, 0.1);
-    color: #00c853;
-    font-weight: bold;
-  }
-</style>
+  <meta charset='UTF-8'/>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
+  <title>تتبع العملات الرقمية | الأسعار المباشرة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Tajawal', Arial, sans-serif;
+      background: #0a192f;
+      color: #e6f1ff;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background: linear-gradient(135deg, #112240 0%, #0a192f 100%);
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+   .header h1 {
+  margin: 0;
+  font-size: 28px;
+  display: flex;
+  justify-content: flex-start; /* يدفعه لأقصى اليمين في RTL */
+  align-items: center;
+  gap: 10px;
+  text-align: right;
+}
 
-<link href="https://fonts.googleapis.com/css2?family=Tajawal&display=swap" rel="stylesheet">
-<style>
-  body {
-    background: #f9f9f9;
-    color: #333;
-    font-family: 'Tajawal', sans-serif;
-  }
-  .card {
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  }
-  h2 {
-    color: #1a73e8;
-  }
+    
+    .header p {
+      margin-top: 5px;
+      color: #a0aec0;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 30px;
+      background: #0f263d;
+      border-bottom: 1px solid #1c2e44;
+    }
+    .controls input,
+    .controls select {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+    }
+    .controls .counter {
+      font-size: 16px;
+      color: #a0aec0;
+    }
+    .coins-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 30px;
+    }
+    .coin-card {
+      background: #112240;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .coin-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+    }
+    .coin-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .coin-logo {
+      width: 35px;
+      height: 35px;
+      margin-left: 10px;
+    }
+    .coin-name {
+      font-weight: bold;
+      font-size: 20px;
+    }
+    .coin-price {
+      font-size: 22px;
+      margin: 10px 0;
+    }
+    .coin-change {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .up {
+      background: rgba(0, 200, 83, 0.1);
+      color: #00c853;
+    }
+    .down {
+      background: rgba(255, 53, 71, 0.1);
+      color: #ff3547;
+    }
+    .coin-stats {
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    .coin-stats span {
+      display: block;
+      margin: 4px 0;
+    }
+    .volume-bar {
+      margin-top: 8px;
+      height: 8px;
+      background: #1a2d4a;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .volume-fill {
+      height: 100%;
+      background: #00bcd4;
+    }
+    .loading {
+      text-align: center;
+      padding: 30px;
+      font-size: 18px;
+    }
+    .footer {
+      background: #112240;
+      color: #a0aec0;
+      text-align: center;
+      padding: 20px;
+      margin-top: 40px;
+      font-size: 14px;
+    }
+  
+.nav-links {
+  margin-top: 10px;
+}
+.nav-links a {
+  color: #64ffda;
+  text-decoration: none;
+  margin: 0 12px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
 </style>
 </head>
 <body>
-  <!-- Header مطابق للتصميم الأصلي -->
-  <header>
-    <div class="container header-container">
-      <div class="logo-container">
-        <img class="logo-img" src="https://1.bp.blogspot.com/-Yq3jYf6sR3k/YJfzqG8n7_I/AAAAAAAAAEs/5ZR3pWQzEf4QdJk8v5FQ2XQ6XZJ1X9XwCLcBGAsYHQ/s320/%25D8%25A5%25D8%25AF%25D8%25B1%25D8%25A9%2B%25D9%2588%25D9%2586%2B%25D9%2584%25D9%2588%25D8%25BA%25D9%2588.png" alt="إدرة ون">
-        <span class="logo-text">إدرة ون</span>
-      </div>
-      <div class="last-update">آخر تحديث: <span id="update-time"></span></div>
+  <div class='header'>
+    <h1><i class="fas fa-coins"></i> ياســر كريبتو</h1>
+    <p>أسعار مباشرة - تحديث كل 1 دقيقة</p>
+<div class="nav-links">
+  <a href="index.html">الرئيسية</a>
+ <li><a href='/p/recommendations.html'>📊 توصيات السوق</a></li>
+
+
+</div>
+
+  </div>
+
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="ابحث عن عملة...">
+    <select id="sortSelect">
+      <option value="none">بدون ترتيب</option>
+      <option value="priceAsc">الأقل سعراً</option>
+      <option value="priceDesc">الأعلى سعراً</option>
+      <option value="changeAsc">الأقل نسبة تغيير</option>
+      <option value="changeDesc">الأعلى نسبة تغيير</option>
+    </select>
+    <div class="counter">عدد العملات: <span id="coinCount">0</span></div>
+  </div>
+
+  <div class='coins-grid' id='coinsGrid'>
+    <div class='loading'>
+      <p><i class="fas fa-spinner fa-spin"></i> جاري تحميل البيانات...</p>
     </div>
-  </header>
-  
-  <!-- Main Content -->
-  <main class="main-content">
-    <div class="container">
-      <h1 class="section-title">ياسر كريبتو الرقمية</h1>
-      
-      <div class="crypto-grid" id="crypto-grid">
-        <div class="loading-container">
-          <i class="fas fa-spinner spinner"></i>
-          <p class="loading-text">جاري تحميل التوصيات...</p>
-        </div>
-      </div>
-    </div>
-  </main>
-  
-  <!-- Footer مطابق للتصميم الأصلي -->
-  <footer>
-    <div class="container footer-content">
-      <div class="footer-logo">إدرة ون</div>
-      <div class="social-links">
-        <a href="#"><i class="fab fa-telegram"></i></a>
-        <a href="#"><i class="fab fa-twitter"></i></a>
-        <a href="#"><i class="fab fa-instagram"></i></a>
-      </div>
-      <p class="copyright">© 2023 جميع الحقوق محفوظة لموقع إدرة ون</p>
-    </div>
-  </footer>
+  </div>
+
+  <div class='footer'>
+    <p>© 2025 | فسوان كريبتو | جميع الحقوق محفوظة</p>
+  </div>
 
   <script>
-    // 1. مكتبة المؤشرات الفنية المدمجة
-    function setupTechnicalIndicators() {
-      function calculateSMA(values, period) {
-        const sma = [];
-        for (let i = period - 1; i < values.length; i++) {
-          const sum = values.slice(i - period + 1, i + 1).reduce((a, b) => a + b, 0);
-          sma.push(sum / period);
-        }
-        return sma;
-      }
+    let allCoins = [];
 
-      function calculateEMA(values, period) {
-        const k = 2 / (period + 1);
-        let ema = [values[0]];
-        for (let i = 1; i < values.length; i++) {
-          ema.push(values[i] * k + ema[i-1] * (1 - k));
-        }
-        return ema;
-      }
-
-      function calculateRSI(values, period = 14) {
-        const deltas = [];
-        const gains = [];
-        const losses = [];
-        
-        for (let i = 1; i < values.length; i++) {
-          deltas.push(values[i] - values[i-1]);
-        }
-        
-        for (const delta of deltas) {
-          gains.push(Math.max(0, delta));
-          losses.push(Math.max(0, -delta));
-        }
-        
-        let avgGain = gains.slice(0, period).reduce((a,b) => a + b, 0) / period;
-        let avgLoss = losses.slice(0, period).reduce((a,b) => a + b, 0) / period;
-        
-        const rsi = [100 - (100 / (1 + (avgGain / avgLoss)))];
-        
-        for (let i = period; i < gains.length; i++) {
-          avgGain = ((avgGain * (period - 1)) + gains[i]) / period;
-          avgLoss = ((avgLoss * (period - 1)) + losses[i]) / period;
-          const rs = avgGain / avgLoss;
-          rsi.push(100 - (100 / (1 + rs)));
-        }
-        
-        return Array(values.length - rsi.length).fill(50).concat(rsi);
-      }
-
-      function calculateMACD(values) {
-        const ema12 = calculateEMA(values, 12);
-        const ema26 = calculateEMA(values, 26);
-        const macdLine = ema12.map((val, idx) => val - ema26[idx]);
-        const signalLine = calculateEMA(macdLine, 9);
-        
-        return macdLine.map((val, idx) => ({
-          MACD: val,
-          signal: signalLine[idx],
-          histogram: val - signalLine[idx]
-        }));
-      }
-
-      window.technicalIndicators = {
-        RSI: { calculate: ({values, period}) => calculateRSI(values, period) },
-        MACD: { calculate: ({values}) => calculateMACD(values) }
-      };
-    }
-
-    // 2. جلب البيانات من Binance
-    async function fetchCryptoData() {
+    async function fetchCoinsData() {
       try {
         const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+        if (!response.ok) throw new Error('فشل في جلب البيانات');
+
         const data = await response.json();
-        
-        return data
-          .filter(c => 
-            c.symbol.endsWith('USDT') && 
-            parseFloat(c.priceChangePercent) > 3 &&
-            !c.symbol.includes('UP') &&
-            !c.symbol.includes('DOWN')
-          )
-          .sort((a, b) => parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent))
-          .slice(0, 12);
+        const stableCoins = ['USDT', 'USDC', 'BUSD', 'TUSD', 'DAI', 'FDUSD', 'UST'];
+
+        allCoins = data.filter(coin => {
+          if (!coin.symbol.endsWith('USDT')) return false;
+          const baseAsset = coin.symbol.replace(/USDT$/, '');
+          return !stableCoins.includes(baseAsset) && parseFloat(coin.lastPrice) > 0;
+        }).slice(0, 800);
+
+        applyFilters();
+        localStorage.setItem("coinData", JSON.stringify(allCoins));
+
       } catch (error) {
-        console.error('فشل جلب البيانات:', error);
-        return [];
+        document.getElementById('coinsGrid').innerHTML = 
+          <div class='loading'><span style="color:red">خطأ: ${error.message}</span></div>
+        ;
       }
     }
 
-    // 3. تحليل البيانات
-    function analyzeCrypto(symbol, closes) {
-      if (!closes || closes.length < 50) return null;
+    function renderCoins(coins) {
+      document.getElementById('coinCount').textContent = coins.length;
 
-      try {
-        const rsi = window.technicalIndicators.RSI.calculate({ 
-          values: closes, 
-          period: 14 
-        });
-        
-        const macd = window.technicalIndicators.MACD.calculate({
-          values: closes
-        });
+      const volumes = coins.map(c => parseFloat(c.quoteVolume));
+      const sortedVolumes = [...volumes].sort((a, b) => b - a);
+      const getLiquidityScore = (v) => {
+        const rank = sortedVolumes.findIndex(x => x === v) + 1;
+        return ((sortedVolumes.length - rank) / sortedVolumes.length) * 100;
+      };
 
-        const latestRSI = rsi[rsi.length - 1];
-        const latestMACD = macd[macd.length - 1];
-        const currentPrice = closes[closes.length - 1];
-        
-        // حساب مستويات التداول
-        const entryPrice = currentPrice;
-        const stopLoss = currentPrice * 0.97;  // وقف خسارة 3%
-        const target1 = currentPrice * 1.05;   // هدف 5%
-        const target2 = currentPrice * 1.10;   // هدف 10%
-        const resistance = currentPrice * 1.03; // مقاومة 3%
-        
-        // تحديد مستوى السيولة
-        const liquidityScore = Math.random();
-        const liquidityLevel = liquidityScore > 0.75 ? 'high' : 'medium';
-        const liquidityText = liquidityLevel === 'high' ? 'عالية' : 'متوسطة';
-
-        return {
-          symbol,
-          price: currentPrice,
-          entry: entryPrice,
-          stopLoss: stopLoss,
-          targets: [target1, target2],
-          resistance: resistance,
-          liquidity: liquidityLevel,
-          liquidityText: liquidityText
-        };
-      } catch (error) {
-        console.error(`خطأ في تحليل ${symbol}:`, error);
-        return null;
-      }
-    }
-
-    // 4. عرض النتائج
-    function displayResults(results) {
-      const grid = document.getElementById('crypto-grid');
-      grid.innerHTML = '';
-      
-      if (results.length === 0) {
-        grid.innerHTML = `
-          <div class="loading-container">
-            <i class="fas fa-exclamation-circle" style="color:var(--red); font-size:2.5rem;"></i>
-            <p class="loading-text">لا توجد توصيات متاحة حالياً</p>
-          </div>`;
-        return;
-      }
-
-      results.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'crypto-card';
-        
-        card.innerHTML = `
-          <div class="card-header">
-            <span class="coin-name">${item.symbol.replace('USDT', '')}/USDT</span>
-            <span class="coin-price">$${item.price.toFixed(4)}</span>
-          </div>
-          <div class="card-body">
-            <div class="info-row">
-              <span class="info-label">سعر الدخول</span>
-              <span class="info-value entry">$${item.entry.toFixed(4)}</span>
+      let html = '';
+      coins.forEach(coin => {
+        const liquidityScore = Math.max(5, getLiquidityScore(parseFloat(coin.quoteVolume)));
+        html += 
+          <div class='coin-card'>
+            <div class='coin-header'>
+              <img src='https://cryptoicons.org/api/icon/${coin.symbol.slice(0,3).toLowerCase()}/50' class='coin-logo' onerror="this.style.display='none'"/>
+              <span class='coin-name'>${coin.symbol}</span>
             </div>
-            <div class="info-row">
-              <span class="info-label">وقف الخسارة</span>
-              <span class="info-value stop-loss">$${item.stopLoss.toFixed(4)}</span>
+            <div class='coin-price'>$${parseFloat(coin.lastPrice).toFixed(2)}</div>
+            <div class='coin-change ${parseFloat(coin.priceChangePercent) >= 0 ? 'up' : 'down'}'>
+              ${parseFloat(coin.priceChangePercent).toFixed(2)}%
             </div>
-            <div class="info-row">
-              <span class="info-label">أقرب مقاومة</span>
-              <span class="info-value resistance">$${item.resistance.toFixed(4)}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">الهدف الأول</span>
-              <span class="info-value target">$${item.targets[0].toFixed(4)}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">الهدف الثاني</span>
-              <span class="info-value target">$${item.targets[1].toFixed(4)}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">مستوى السيولة</span>
-              <span class="info-value">
-                <span class="liquidity-badge ${item.liquidity}">${item.liquidityText}</span>
-              </span>
+            <div class='coin-stats'>
+              <span>أعلى 24 ساعة: $${parseFloat(coin.highPrice).toFixed(2)}</span>
+              <span>أدنى 24 ساعة: $${parseFloat(coin.lowPrice).toFixed(2)}</span>
+              <span>تدفق السيولة: $${parseFloat(coin.quoteVolume).toFixed(0)}</span>
+              <div class="volume-bar"><div class="volume-fill" style="width:${liquidityScore}%"></div></div>
             </div>
           </div>
-        `;
-        
-        grid.appendChild(card);
+        ;
       });
-      
-      // تحديث وقت التحديث الأخير
-      const now = new Date();
-      document.getElementById('update-time').textContent = now.toLocaleString('ar-EG', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      document.getElementById('coinsGrid').innerHTML = html;
     }
 
-    // 5. الدالة الرئيسية
-    async function runAnalysis() {
-      try {
-        // إعداد المؤشرات الفنية
-        setupTechnicalIndicators();
-        
-        document.getElementById('crypto-grid').innerHTML = `
-          <div class="loading-container">
-            <i class="fas fa-spinner spinner"></i>
-            <p class="loading-text">جاري تحليل البيانات وتحميل التوصيات...</p>
-          </div>`;
-        
-        const cryptoData = await fetchCryptoData();
-        const results = [];
-        
-        for (const crypto of cryptoData) {
-          try {
-            const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${crypto.symbol}&interval=1h&limit=100`);
-            const data = await response.json();
-            const closes = data.map(c => parseFloat(c[4]));
-            
-            const analysis = analyzeCrypto(crypto.symbol, closes);
-            if (analysis) results.push(analysis);
-          } catch (error) {
-            console.warn(`خطأ في معالجة ${crypto.symbol}:`, error);
-          }
-        }
+    function applyFilters() {
+      const keyword = document.getElementById('searchInput').value.trim().toUpperCase();
+      let filtered = allCoins.filter(c => c.symbol.includes(keyword));
 
-        displayResults(results);
-      } catch (error) {
-        document.getElementById('crypto-grid').innerHTML = `
-          <div class="loading-container">
-            <i class="fas fa-exclamation-triangle" style="color:var(--red); font-size:2.5rem;"></i>
-            <p class="loading-text">حدث خطأ في تحميل البيانات</p>
-            <button onclick="runAnalysis()" style="
-              background: var(--primary-blue);
-              color: white;
-              border: none;
-              padding: 10px 25px;
-              border-radius: 5px;
-              margin-top: 15px;
-              cursor: pointer;
-              font-size: 1rem;
-            ">
-              <i class="fas fa-sync-alt"></i> إعادة المحاولة
-            </button>
-          </div>`;
+      const sort = document.getElementById('sortSelect').value;
+      if (sort === 'priceAsc') {
+        filtered.sort((a, b) => parseFloat(a.lastPrice) - parseFloat(b.lastPrice));
+      } else if (sort === 'priceDesc') {
+        filtered.sort((a, b) => parseFloat(b.lastPrice) - parseFloat(a.lastPrice));
+      } else if (sort === 'changeAsc') {
+        filtered.sort((a, b) => parseFloat(a.priceChangePercent) - parseFloat(b.priceChangePercent));
+      } else if (sort === 'changeDesc') {
+        filtered.sort((a, b) => parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent));
       }
+
+      renderCoins(filtered);
     }
 
-    // بدء التحليل عند تحميل الصفحة
-    window.addEventListener('load', runAnalysis);
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('sortSelect').addEventListener('change', applyFilters);
+
+    fetchCoinsData();
+    setInterval(fetchCoinsData, 60000);
   </script>
 </body>
 </html>
