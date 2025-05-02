@@ -5,276 +5,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ياسر كريبتو | إدرة ون | ياسر كريبتو الرقمية</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    /* ألوان الموقع الرسمي */
-    :root {
-      --primary-blue: #1a73e8;
-      --dark-blue: #0d47a1;
-      --white: #ffffff;
-      --light-gray: #f8f9fa;
-      --medium-gray: #e0e0e0;
-      --dark-gray: #333333;
-      --green: #34a853;
-      --red: #ea4335;
-      --yellow: #fbbc05;
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Tajawal', sans-serif;
-    }
-    
-    body {
-      background-color: var(--white);
-      color: var(--dark-gray);
-      line-height: 1.6;
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 15px;
-    }
-    
-    /* Header - مطابق للتصميم الأصلي */
-    header {
-      background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-      padding: 15px 0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    
-    .header-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .logo-container {
-      display: flex;
-      align-items: center;
-    }
-    
-    .logo-img {
-      height: 50px;
-      margin-left: 10px;
-    }
-    
-    .logo-text {
-      color: var(--white);
-      font-size: 1.8rem;
-      font-weight: 700;
-    }
-    
-    .last-update {
-      color: rgba(255,255,255,0.9);
-      font-size: 0.9rem;
-    }
-    
-    /* Main Content */
-    .main-content {
-      padding: 30px 0;
-      background-color: var(--white);
-    }
-    
-    .section-title {
-      font-size: 1.8rem;
-      color: var(--primary-blue);
-      margin-bottom: 25px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid var(--primary-blue);
-    }
-    
-    /* Crypto Cards - مطابقة للتصميم الأصلي */
-    .crypto-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 25px;
-    }
-    
-    .crypto-card {
-      background: var(--white);
-      border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-      border: 1px solid var(--medium-gray);
-      transition: all 0.3s ease;
-    }
-    
-    .crypto-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-    
-    .card-header {
-      background: var(--primary-blue);
-      color: var(--white);
-      padding: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-radius: 10px 10px 0 0;
-    }
-    
-    .coin-name {
-      font-size: 1.3rem;
-      font-weight: 700;
-    }
-    
-    .coin-price {
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
-    
-    .card-body {
-      padding: 20px;
-    }
-    
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 15px;
-      padding-bottom: 15px;
-      border-bottom: 1px dashed var(--medium-gray);
-    }
-    
-    .info-row:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
-    
-    .info-label {
-      color: var(--dark-gray);
-      font-size: 1rem;
-    }
-    
-    .info-value {
-      font-weight: 600;
-      font-size: 1.05rem;
-    }
-    
-    .target {
-      color: var(--green);
-    }
-    
-    .resistance {
-      color: var(--red);
-    }
-    
-    .entry {
-      color: var(--primary-blue);
-    }
-    
-    .stop-loss {
-      color: var(--red);
-    }
-    
-    .liquidity-badge {
-      display: inline-block;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-    
-    .high {
-      background-color: rgba(52, 168, 83, 0.1);
-      color: var(--green);
-    }
-    
-    .medium {
-      background-color: rgba(251, 188, 5, 0.1);
-      color: var(--yellow);
-    }
-    
-    /* Footer - مطابق للتصميم الأصلي */
-    footer {
-      background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-      color: var(--white);
-      padding: 30px 0;
-      text-align: center;
-    }
-    
-    .footer-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    
-    .footer-logo {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 15px;
-    }
-    
-    .social-links {
-      margin: 20px 0;
-    }
-    
-    .social-links a {
-      color: var(--white);
-      margin: 0 12px;
-      font-size: 1.3rem;
-      transition: opacity 0.3s;
-    }
-    
-    .social-links a:hover {
-      opacity: 0.8;
-    }
-    
-    .copyright {
-      font-size: 0.9rem;
-      opacity: 0.9;
-    }
-    
-    /* Loading State */
-    .loading-container {
-      grid-column: 1/-1;
-      text-align: center;
-      padding: 50px 0;
-    }
-    
-    .loading-text {
-      font-size: 1.2rem;
-      color: var(--dark-gray);
-      margin-top: 15px;
-    }
-    
-    .spinner {
-      color: var(--primary-blue);
-      font-size: 2rem;
-      animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-      .header-container {
-        flex-direction: column;
-      }
-      
-      .logo-container {
-        margin-bottom: 10px;
-      }
-      
-      .last-update {
-        margin-top: 5px;
-      }
-      
-      .crypto-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .section-title {
-        font-size: 1.5rem;
-      }
-    }
-  </style>
+  
+<style>
+  body {
+    background: #0a192f;
+    color: #e6f1ff;
+    font-family: 'Tajawal', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background: linear-gradient(135deg, #112240 0%, #0a192f 100%);
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  header img {
+    height: 60px;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 30px;
+  }
+  .card {
+    background: #112240;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+  }
+  .card h2 {
+    color: #64ffda;
+    margin-bottom: 8px;
+  }
+  .details {
+    font-size: 14px;
+    margin-top: 12px;
+  }
+  .suggestion {
+    margin-top: 10px;
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: rgba(0, 200, 83, 0.1);
+    color: #00c853;
+    font-weight: bold;
+  }
+</style>
+
 <link href="https://fonts.googleapis.com/css2?family=Tajawal&display=swap" rel="stylesheet">
 <style>
   body {
