@@ -11,28 +11,34 @@
       margin: 0;
       padding: 20px;
     }
-    .error {
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .card {
+      background: #112240;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .suggestion {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .buy { background: #003c2c; color: #00e676; }
+    .neutral { background: #1a237e; color: #9fa8da; }
+    .error { 
       background: #1e1e2d;
       padding: 20px;
       border-radius: 8px;
       text-align: center;
-      line-height: 1.6;
-      max-width: 600px;
       margin: 20px auto;
-    }
-    .error button {
-      background: #00e676;
-      color: #000;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 10px;
-      font-family: 'Tajawal';
-    }
-    .error a {
-      color: #64ffda;
-      text-decoration: underline;
+      max-width: 600px;
     }
   </style>
 </head>
@@ -41,35 +47,11 @@
   <div id="cardsGrid">جاري التحميل...</div>
 
   <script>
-    // 1. نسخة احتياطية مدمجة من المكتبة
-    function loadBackupIndicators() {
-      const backupCode = `
-        // كود مختصر لمؤشر RSI
-        const RSI = {
-          calculate: function({values, period}) {
-            const results = [];
-            for (let i = period; i < values.length; i++) {
-              let avgGain = 0;
-              let avgLoss = 0;
-              // ... كود حساب RSI ...
-              results.push(50 + (avgGain - avgLoss));
-            }
-            return results;
-          }
-        };
-        window.technicalIndicators = { RSI, MACD: RSI }; // نسخة مبسطة
-      `;
-      const script = document.createElement('script');
-      script.text = backupCode;
-      document.head.appendChild(script);
-    }
-
-    // 2. محاولة التحميل من مصادر متعددة
+    // 1. تحميل المكتبة مع حل احتياطي
     async function loadIndicators() {
       const sources = [
-        'https://cdn.jsdelivr.net/gh/anandanand84/technicalindicators@3.1.1/dist/technicalindicators.min.js',
-        'https://unpkg.com/technicalindicators@3.1.1/dist/technicalindicators.min.js',
-        'https://cdnjs.cloudflare.com/ajax/libs/technicalindicators/3.1.1/technicalindicators.min.js'
+        'https://cdn.jsdelivr.net/npm/technicalindicators@3.1.1/dist/browser.js',
+        'https://unpkg.com/technicalindicators@3.1.1/dist/technicalindicators.min.js'
       ];
 
       for (const src of sources) {
@@ -81,66 +63,134 @@
             script.onerror = reject;
             document.head.appendChild(script);
           });
-          if (typeof technicalIndicators !== 'undefined') break;
+          if (typeof window.RSI !== 'undefined') break;
         } catch (e) {
           console.warn(`فشل التحميل من ${src}`);
         }
       }
-
-      if (typeof technicalIndicators === 'undefined') {
-        loadBackupIndicators();
-      }
     }
 
-    // 3. عرض رسالة الخطأ
-    function showError(msg) {
-      document.getElementById('cardsGrid').innerHTML = `
-        <div class="error">
-          ${msg}<br>
-          <button onclick="window.location.reload()">تحديث الصفحة</button>
-          <p>إذا استمرت المشكلة، جرب:</p>
-          <ul style="text-align: right; margin-right: 20px">
-            <li>فتح الرابط في متصفح <a href="https://www.mozilla.org/firefox/" target="_blank">Firefox</a></li>
-            <li>تعطيل مانع الإعلانات مؤقتاً</li>
-            <li>فتح <a href="https://cors-anywhere.herokuapp.com/" target="_blank">هذا الرابط</a> والضغط على "Request access"</li>
-          </ul>
-        </div>`;
-    }
-
-    // 4. الدوال الأساسية
-    async function fetchTopMovers() {
+    // 2. جلب البيانات من Binance
+    async function fetchCryptoData() {
       try {
-        const res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
-        return await res.json();
+        const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+        const data = await response.json();
+        
+        return data
+          .filter(c => 
+            c.symbol.endsWith('USDT') && 
+            parseFloat(c.priceChangePercent) > 5
+          )
+          .slice(0, 30); // عرض أول 30 عملة فقط
       } catch (error) {
         console.error('فشل جلب البيانات:', error);
         return [];
       }
     }
 
+    // 3. تحليل المؤشرات الفنية
+    function analyzeCrypto(symbol, closes) {
+      if (!closes || closes.length < 50) return null;
+
+      try {
+        const rsi = window.RSI.calculate({ values: closes, period: 14 });
+        const macd = window.MACD.calculate({
+          values: closes,
+          fastPeriod: 12,
+          slowPeriod: 26,
+          signalPeriod: 9
+        });
+
+        const latestRSI = rsi[rsi.length - 1];
+        const latestMACD = macd[macd.length - 1];
+        const currentPrice = closes[closes.length - 1];
+
+        return {
+          symbol,
+          rsi: latestRSI,
+          macd: latestMACD.MACD,
+          signal: latestMACD.signal,
+          price: currentPrice
+        };
+      } catch (error) {
+        console.error(`خطأ في تحليل ${symbol}:`, error);
+        return null;
+      }
+    }
+
+    // 4. عرض النتائج
+    function displayResults(results) {
+      const grid = document.getElementById('cardsGrid');
+      grid.innerHTML = '';
+      
+      if (results.length === 0) {
+        grid.innerHTML = '<div class="error">⚠️ لا توجد عملات مؤهلة حسب المعايير</div>';
+        return;
+      }
+
+      results.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        
+        const suggestionClass = (item.rsi > 30 && item.rsi < 70) ? 'buy' : 'neutral';
+        const suggestionText = (item.rsi > 30 && item.rsi < 70) ? '✅ توصية شراء' : '🟡 محايد';
+        
+        card.innerHTML = `
+          <h2>${item.symbol}</h2>
+          <p>السعر: $${item.price.toFixed(4)}</p>
+          <p>RSI: ${item.rsi.toFixed(2)}</p>
+          <p>MACD: ${item.macd.toFixed(4)}</p>
+          <div class="suggestion ${suggestionClass}">${suggestionText}</div>
+        `;
+        
+        grid.appendChild(card);
+      });
+    }
+
+    // 5. الدالة الرئيسية
     async function runAnalysis() {
       try {
         await loadIndicators();
         
-        if (typeof technicalIndicators === 'undefined') {
-          showError('❌ تعذر تحميل الأدوات التقنية. جرب تحديث الصفحة.');
+        if (typeof window.RSI === 'undefined') {
+          document.getElementById('cardsGrid').innerHTML = '
+            <div class="error">
+              ❌ تعذر تحميل الأدوات التقنية<br>
+              جرب <button onclick="window.location.reload()">تحديث الصفحة</button>
+              أو استخدم متصفح Firefox
+            </div>';
           return;
         }
 
-        const data = await fetchTopMovers();
-        document.getElementById('cardsGrid').innerHTML = `
-          <div class="card">
-            <h2>تحليل ناجح!</h2>
-            <p>تم تحميل ${data.length} عملة بنجاح</p>
-            <p>الإصدار: ${technicalIndicators.version || 'نسخة احتياطية'}</p>
-          </div>`;
+        document.getElementById('cardsGrid').innerHTML = 'جاري تحليل البيانات...';
         
+        const cryptoData = await fetchCryptoData();
+        const results = [];
+        
+        for (const crypto of cryptoData) {
+          try {
+            const closes = await fetch(`https://api.binance.com/api/v3/klines?symbol=${crypto.symbol}&interval=1h&limit=100`)
+              .then(res => res.json())
+              .then(data => data.map(c => parseFloat(c[4])));
+            
+            const analysis = analyzeCrypto(crypto.symbol, closes);
+            if (analysis) results.push(analysis);
+          } catch (error) {
+            console.warn(`خطأ في معالجة ${crypto.symbol}:`, error);
+          }
+        }
+
+        displayResults(results);
       } catch (error) {
-        showError(`❌ خطأ غير متوقع: ${error.message}`);
+        document.getElementById('cardsGrid').innerHTML = `
+          <div class="error">
+            ❌ حدث خطأ غير متوقع:<br>
+            ${error.message}
+          </div>`;
       }
     }
 
-    // بدء التشغيل
+    // بدء التشغيل التلقائي
     window.addEventListener('load', runAnalysis);
   </script>
 </body>
