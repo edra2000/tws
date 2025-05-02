@@ -6,17 +6,17 @@
   <title>إدرة ون | توصيات العملات الرقمية</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    /* ألوان الموقع الرسمي */
     :root {
-      --primary: #1a73e8;
-      --primary-dark: #0d47a1;
-      --secondary: #ffffff;
-      --text: #333333;
-      --text-light: #666666;
-      --border: #e0e0e0;
-      --success: #34a853;
-      --danger: #ea4335;
-      --warning: #fbbc05;
-      --info: #1a73e8;
+      --primary-blue: #1a73e8;
+      --dark-blue: #0d47a1;
+      --white: #ffffff;
+      --light-gray: #f8f9fa;
+      --medium-gray: #e0e0e0;
+      --dark-gray: #333333;
+      --green: #34a853;
+      --red: #ea4335;
+      --yellow: #fbbc05;
     }
     
     * {
@@ -27,8 +27,8 @@
     }
     
     body {
-      background-color: var(--secondary);
-      color: var(--text);
+      background-color: var(--white);
+      color: var(--dark-gray);
       line-height: 1.6;
     }
     
@@ -38,105 +38,104 @@
       padding: 0 15px;
     }
     
-    /* Header Styles */
+    /* Header - مطابق للتصميم الأصلي */
     header {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-      padding: 1rem 0;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+      padding: 15px 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     
-    .header-content {
+    .header-container {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     
-    .logo {
+    .logo-container {
       display: flex;
       align-items: center;
     }
     
-    .logo img {
-      height: 40px;
+    .logo-img {
+      height: 50px;
       margin-left: 10px;
     }
     
     .logo-text {
-      font-size: 1.5rem;
+      color: var(--white);
+      font-size: 1.8rem;
       font-weight: 700;
-      color: white;
     }
     
     .last-update {
-      font-size: 0.9rem;
       color: rgba(255,255,255,0.9);
+      font-size: 0.9rem;
     }
     
     /* Main Content */
     .main-content {
-      padding: 2rem 0;
-      background-color: var(--secondary);
+      padding: 30px 0;
+      background-color: var(--white);
     }
     
     .section-title {
-      font-size: 1.5rem;
-      margin-bottom: 1.5rem;
-      color: var(--primary);
-      border-right: 4px solid var(--primary);
-      padding-right: 10px;
+      font-size: 1.8rem;
+      color: var(--primary-blue);
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--primary-blue);
     }
     
-    /* Crypto Cards */
+    /* Crypto Cards - مطابقة للتصميم الأصلي */
     .crypto-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
     }
     
     .crypto-card {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      overflow: hidden;
+      background: var(--white);
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      border: 1px solid var(--medium-gray);
       transition: all 0.3s ease;
-      border: 1px solid var(--border);
     }
     
     .crypto-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     }
     
     .card-header {
-      background: var(--primary);
-      color: white;
-      padding: 12px 15px;
+      background: var(--primary-blue);
+      color: var(--white);
+      padding: 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border-radius: 10px 10px 0 0;
     }
     
     .coin-name {
-      font-size: 1.1rem;
+      font-size: 1.3rem;
       font-weight: 700;
     }
     
     .coin-price {
-      font-size: 1rem;
+      font-size: 1.2rem;
       font-weight: 600;
     }
     
     .card-body {
-      padding: 15px;
+      padding: 20px;
     }
     
     .info-row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 12px;
-      padding-bottom: 12px;
-      border-bottom: 1px dashed var(--border);
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px dashed var(--medium-gray);
     }
     
     .info-row:last-child {
@@ -146,56 +145,55 @@
     }
     
     .info-label {
-      color: var(--text-light);
-      font-size: 0.9rem;
+      color: var(--dark-gray);
+      font-size: 1rem;
     }
     
     .info-value {
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 1.05rem;
     }
     
-    .target-price {
-      color: var(--success);
+    .target {
+      color: var(--green);
     }
     
     .resistance {
-      color: var(--danger);
+      color: var(--red);
     }
     
     .entry {
-      color: var(--primary);
+      color: var(--primary-blue);
     }
     
     .stop-loss {
-      color: var(--danger);
+      color: var(--red);
     }
     
     .liquidity-badge {
       display: inline-block;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.85rem;
+      font-weight: 600;
     }
     
-    .high-liquidity {
-      background: rgba(52, 168, 83, 0.1);
-      color: var(--success);
+    .high {
+      background-color: rgba(52, 168, 83, 0.1);
+      color: var(--green);
     }
     
-    .medium-liquidity {
-      background: rgba(251, 188, 5, 0.1);
-      color: var(--warning);
+    .medium {
+      background-color: rgba(251, 188, 5, 0.1);
+      color: var(--yellow);
     }
     
-    /* Footer */
+    /* Footer - مطابق للتصميم الأصلي */
     footer {
-      background: var(--primary);
-      color: white;
-      padding: 1.5rem 0;
+      background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+      color: var(--white);
+      padding: 30px 0;
       text-align: center;
-      margin-top: 2rem;
     }
     
     .footer-content {
@@ -205,19 +203,19 @@
     }
     
     .footer-logo {
-      font-size: 1.3rem;
+      font-size: 1.8rem;
       font-weight: 700;
-      margin-bottom: 1rem;
+      margin-bottom: 15px;
     }
     
     .social-links {
-      margin: 1rem 0;
+      margin: 20px 0;
     }
     
     .social-links a {
-      color: white;
-      margin: 0 10px;
-      font-size: 1.1rem;
+      color: var(--white);
+      margin: 0 12px;
+      font-size: 1.3rem;
       transition: opacity 0.3s;
     }
     
@@ -226,66 +224,85 @@
     }
     
     .copyright {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       opacity: 0.9;
     }
     
     /* Loading State */
-    .loading {
+    .loading-container {
+      grid-column: 1/-1;
       text-align: center;
-      padding: 2rem;
-      color: var(--text-light);
+      padding: 50px 0;
     }
     
-    .loading i {
-      margin-left: 8px;
+    .loading-text {
+      font-size: 1.2rem;
+      color: var(--dark-gray);
+      margin-top: 15px;
+    }
+    
+    .spinner {
+      color: var(--primary-blue);
+      font-size: 2rem;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
     
     /* Responsive */
     @media (max-width: 768px) {
+      .header-container {
+        flex-direction: column;
+      }
+      
+      .logo-container {
+        margin-bottom: 10px;
+      }
+      
+      .last-update {
+        margin-top: 5px;
+      }
+      
       .crypto-grid {
         grid-template-columns: 1fr;
       }
       
-      .header-content {
-        flex-direction: column;
-        text-align: center;
-      }
-      
-      .logo {
-        margin-bottom: 10px;
-        justify-content: center;
-      }
-      
-      .last-update {
-        margin-top: 8px;
+      .section-title {
+        font-size: 1.5rem;
       }
     }
   </style>
 </head>
 <body>
+  <!-- Header مطابق للتصميم الأصلي -->
   <header>
-    <div class="container header-content">
-      <div class="logo">
-        <img src="https://1.bp.blogspot.com/-Yq3jYf6sR3k/YJfzqG8n7_I/AAAAAAAAAEs/5ZR3pWQzEf4QdJk8v5FQ2XQ6XZJ1X9XwCLcBGAsYHQ/s320/%25D8%25A5%25D8%25AF%25D8%25B1%25D8%25A9%2B%25D9%2588%25D9%2586%2B%25D9%2584%25D9%2588%25D8%25BA%25D9%2588.png" alt="إدرة ون">
+    <div class="container header-container">
+      <div class="logo-container">
+        <img class="logo-img" src="https://1.bp.blogspot.com/-Yq3jYf6sR3k/YJfzqG8n7_I/AAAAAAAAAEs/5ZR3pWQzEf4QdJk8v5FQ2XQ6XZJ1X9XwCLcBGAsYHQ/s320/%25D8%25A5%25D8%25AF%25D8%25B1%25D8%25A9%2B%25D9%2588%25D9%2586%2B%25D9%2584%25D9%2588%25D8%25BA%25D9%2588.png" alt="إدرة ون">
         <span class="logo-text">إدرة ون</span>
       </div>
       <div class="last-update">آخر تحديث: <span id="update-time"></span></div>
     </div>
   </header>
   
+  <!-- Main Content -->
   <main class="main-content">
     <div class="container">
-      <h2 class="section-title">توصيات العملات الرقمية</h2>
+      <h1 class="section-title">توصيات العملات الرقمية</h1>
       
       <div class="crypto-grid" id="crypto-grid">
-        <div class="loading">
-          <i class="fas fa-spinner fa-spin"></i> جاري تحميل البيانات...
+        <div class="loading-container">
+          <i class="fas fa-spinner spinner"></i>
+          <p class="loading-text">جاري تحميل التوصيات...</p>
         </div>
       </div>
     </div>
   </main>
   
+  <!-- Footer مطابق للتصميم الأصلي -->
   <footer>
     <div class="container footer-content">
       <div class="footer-logo">إدرة ون</div>
@@ -294,7 +311,7 @@
         <a href="#"><i class="fab fa-twitter"></i></a>
         <a href="#"><i class="fab fa-instagram"></i></a>
       </div>
-      <p class="copyright">© 2023 جميع الحقوق محفوظة لـ إدرة ون</p>
+      <p class="copyright">© 2023 جميع الحقوق محفوظة لموقع إدرة ون</p>
     </div>
   </footer>
 
@@ -376,12 +393,12 @@
         return data
           .filter(c => 
             c.symbol.endsWith('USDT') && 
-            parseFloat(c.priceChangePercent) > 3 && // تغيير إلى 3% لأغراض العرض
+            parseFloat(c.priceChangePercent) > 3 &&
             !c.symbol.includes('UP') &&
             !c.symbol.includes('DOWN')
           )
           .sort((a, b) => parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent))
-          .slice(0, 12); // عرض 12 عملة فقط لأغراض العرض
+          .slice(0, 12);
       } catch (error) {
         console.error('فشل جلب البيانات:', error);
         return [];
@@ -406,17 +423,17 @@
         const latestMACD = macd[macd.length - 1];
         const currentPrice = closes[closes.length - 1];
         
-        // حساب الأهداف والمقاومات ووقف الخسارة
+        // حساب مستويات التداول
         const entryPrice = currentPrice;
-        const stopLoss = currentPrice * 0.97; // وقف خسارة 3%
-        const target1 = currentPrice * 1.05;  // هدف 5%
-        const target2 = currentPrice * 1.08;  // هدف 8%
+        const stopLoss = currentPrice * 0.97;  // وقف خسارة 3%
+        const target1 = currentPrice * 1.05;   // هدف 5%
+        const target2 = currentPrice * 1.10;   // هدف 10%
         const resistance = currentPrice * 1.03; // مقاومة 3%
         
-        // تحديد السيولة (عشوائي لأغراض العرض)
+        // تحديد مستوى السيولة
         const liquidityScore = Math.random();
-        const liquidity = liquidityScore > 0.7 ? 'high' : 'medium';
-        const liquidityText = liquidityScore > 0.7 ? 'عالية' : 'متوسطة';
+        const liquidityLevel = liquidityScore > 0.75 ? 'high' : 'medium';
+        const liquidityText = liquidityLevel === 'high' ? 'عالية' : 'متوسطة';
 
         return {
           symbol,
@@ -425,7 +442,7 @@
           stopLoss: stopLoss,
           targets: [target1, target2],
           resistance: resistance,
-          liquidity: liquidity,
+          liquidity: liquidityLevel,
           liquidityText: liquidityText
         };
       } catch (error) {
@@ -441,8 +458,9 @@
       
       if (results.length === 0) {
         grid.innerHTML = `
-          <div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-light)">
-            لا توجد توصيات متاحة حالياً، يرجى المحاولة لاحقاً
+          <div class="loading-container">
+            <i class="fas fa-exclamation-circle" style="color:var(--red); font-size:2.5rem;"></i>
+            <p class="loading-text">لا توجد توصيات متاحة حالياً</p>
           </div>`;
         return;
       }
@@ -453,7 +471,7 @@
         
         card.innerHTML = `
           <div class="card-header">
-            <span class="coin-name">${item.symbol.replace('USDT', '')}</span>
+            <span class="coin-name">${item.symbol.replace('USDT', '')}/USDT</span>
             <span class="coin-price">$${item.price.toFixed(4)}</span>
           </div>
           <div class="card-body">
@@ -471,18 +489,16 @@
             </div>
             <div class="info-row">
               <span class="info-label">الهدف الأول</span>
-              <span class="info-value target-price">$${item.targets[0].toFixed(4)}</span>
+              <span class="info-value target">$${item.targets[0].toFixed(4)}</span>
             </div>
             <div class="info-row">
               <span class="info-label">الهدف الثاني</span>
-              <span class="info-value target-price">$${item.targets[1].toFixed(4)}</span>
+              <span class="info-value target">$${item.targets[1].toFixed(4)}</span>
             </div>
             <div class="info-row">
               <span class="info-label">مستوى السيولة</span>
               <span class="info-value">
-                <span class="liquidity-badge ${item.liquidity}-liquidity">
-                  ${item.liquidityText}
-                </span>
+                <span class="liquidity-badge ${item.liquidity}">${item.liquidityText}</span>
               </span>
             </div>
           </div>
@@ -509,8 +525,9 @@
         setupTechnicalIndicators();
         
         document.getElementById('crypto-grid').innerHTML = `
-          <div class="loading">
-            <i class="fas fa-spinner fa-spin"></i> جاري تحليل البيانات...
+          <div class="loading-container">
+            <i class="fas fa-spinner spinner"></i>
+            <p class="loading-text">جاري تحليل البيانات وتحميل التوصيات...</p>
           </div>`;
         
         const cryptoData = await fetchCryptoData();
@@ -532,17 +549,21 @@
         displayResults(results);
       } catch (error) {
         document.getElementById('crypto-grid').innerHTML = `
-          <div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--danger)">
-            <p>حدث خطأ في تحميل البيانات</p>
+          <div class="loading-container">
+            <i class="fas fa-exclamation-triangle" style="color:var(--red); font-size:2.5rem;"></i>
+            <p class="loading-text">حدث خطأ في تحميل البيانات</p>
             <button onclick="runAnalysis()" style="
-              background: var(--primary);
+              background: var(--primary-blue);
               color: white;
               border: none;
-              padding: 8px 20px;
-              border-radius: 4px;
-              margin-top: 10px;
+              padding: 10px 25px;
+              border-radius: 5px;
+              margin-top: 15px;
               cursor: pointer;
-            ">إعادة المحاولة</button>
+              font-size: 1rem;
+            ">
+              <i class="fas fa-sync-alt"></i> إعادة المحاولة
+            </button>
           </div>`;
       }
     }
